@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Suchergebnisse
+{% endblock %}
+
+{% block main %}
+{% if results %}
+{% for result in results %}
+<h4 class="display-4"><strong>{{ result.autorinnenname }}</strong><br><em>{{ result.titel }}</em> ({{ result.teilnahmejahr }})</h4>
+<br>
+<br>
+<dl class="row">
+  <dt class="col-sm-3 text-left">Land</dt>
+  <dd class="col-sm-9 text-left">{{ result.land }}</dd>
+
+  <dt class="col-sm-3 text-left">Wohnort</dt>
+  <dd class="col-sm-9 text-left">{{ result.wohnort }}</dd>
+
+  <dt class="col-sm-3 text-left">Geburtsjahr</dt>
+  <dd class="col-sm-9 text-left">{{ result.geburtsjahr }}</dd>
+
+  <dt class="col-sm-3 text-left">Eingeladen von</dt>
+  <dd class="col-sm-9 text-left">{{ result.eingeladen_von }}</dd>
+
+  <dt class="col-sm-3 text-left">Preise gewonnen?</dt>
+  <dd class="col-sm-9 text-left">{{ result.preis }}</dd>
+</dl>
+<h6 class="display-6">Worthäufigkeit</h6>
+<canvas id="chart" width="600" height="400"></canvas>
+
+<script>
+   // bar chart data
+   var barData = {
+   labels : [
+          {% for item in labels %}
+           "{{ item }}",
+          {% endfor %}],
+   datasets : [
+      {
+            fillColor: "rgba(151,187,205,0.4)",
+            strokeColor: "rgba(151,187,205,1)",
+            pointColor: "rgba(151,187,205,1)",
+            data : [
+              {% for item in values %}
+               "{{ item }}",
+              {% endfor %}]
+      }
+      ]
+   }
+   // get bar chart canvas
+   var mychart = document.getElementById("chart").getContext("2d");
+   steps = 10
+   max = {{ max }}
+
+  // draw bar chart
+   new Chart(mychart).Bar(barData, {
+        scaleOverride: true,
+        scaleSteps: steps,
+        scaleStepWidth: Math.ceil(max / steps),
+        scaleStartValue: 0,
+        scaleShowVerticalLines: true,
+        scaleShowGridLines : true,
+        barShowStroke : true,
+        scaleShowLabels: true
+   });
+</script>
+{% endfor %}
+{% endif %}
+{% endblock %}

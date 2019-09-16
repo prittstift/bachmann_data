@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Suchergebnisse
+{% endblock %}
+
+{% block main %}
+{% if results %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Autor</th>
+      <th scope="col">Titel</th>
+      <th scope="col">Teilnahmejahr</th>
+      <th scope="col">Eingeladen von</th>
+      <th scope="col">*</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for result in results %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ result.autorinnenname }}</td>
+      <td>{{ result.titel }}</td>
+      <td>{{ result.teilnahmejahr }}</td>
+      <td>{{ result.eingeladen_von }}</td>
+      <td>
+        <a class="btn btn-primary" href="/text/{{ result.id }}" role="button">Details</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}
