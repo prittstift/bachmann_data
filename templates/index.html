@@ -5,9 +5,23 @@
 {% endblock %}
 
 {% block main %}
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="display-4">Count Bachmann</h1>
+    <p class="lead">Daten zum Bachmann-Wettbewerb recherchieren</p>
+  </div>
+</div>
 <form action="/" method="post">
     <div class="form-group">
-        <input autocomplete="off" autofocus class="form-control" name="year" placeholder="Jahr" type="number" min="2014" max="2019" step="1">
+        <select autocomplete="off" autofocus class="form-control" name="year" placeholder="Jahr" type="number">
+          <option disabled selected>Jahr</option>
+          <option>2014</option>
+          <option>2015</option>
+          <option>2016</option>
+          <option>2017</option>
+          <option>2018</option>
+          <option>2019</option>
+        </select>
     </div>
     <div class="form-group">
         <input class="form-control" name="author" placeholder="Autorin" type="text">
@@ -16,7 +30,22 @@
         <input class="form-control" name="title" placeholder="Titel" type="text">
     </div>
     <div class="form-group">
-        <input class="form-control" name="invited_by" placeholder="Eingeladen von" type="text">
+        <select class="form-control" name="invited_by" placeholder="Eingeladen von" type="text">
+          <option disabled selected>Kritikerin</option>
+          <option>Insa Wilke</option>
+          <option>Klaus Kastberger</option>
+          <option>Nora Gomringer</option>
+          <option>Hildegard E. Keller</option>
+          <option>Stefan Gmünder</option>
+          <option>Hubert Winkels</option>
+          <option>Michael Wiederstein</option>
+          <option>Sandra Kegel</option>
+          <option>Meike Feßmann</option>
+          <option>Juri Steiner</option>
+          <option>Arno Dusini</option>
+          <option>Daniela Strigl</option>
+          <option>Burkhard Spinnen</option>
+        </select>
     </div>
     <button class="btn btn-primary" type="submit">Suche</button>
 </form>

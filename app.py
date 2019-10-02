@@ -39,7 +39,7 @@ Session(app)
 
 
 @app.route("/",  methods=["GET", "POST"])
-@login_required
+# @login_required
 def index():
     if request.method == "POST":
 
@@ -84,7 +84,7 @@ def index():
 
 
 @app.route("/search",  methods=["GET", "POST"])
-@login_required
+# @login_required
 def search():
     if request.method == "POST":
         return render_template("text.html")
@@ -93,7 +93,7 @@ def search():
 
 
 @app.route("/text/<int:search_result>",  methods=["GET"])
-@login_required
+# @login_required
 def text(search_result):
     rows = db.execute("SELECT * FROM autorinnen WHERE autorinnen.id = :text_id",
                       {"text_id": search_result}).fetchall()
@@ -182,6 +182,13 @@ def login():
         return render_template("login.html")
 
 
+@app.route("/kritchart")
+def kritchart():
+    """Show chart of critics"""
+
+    return render_template("kritchart.html")
+
+
 @app.route("/logout")
 def logout():
     """Log user out"""
@@ -239,30 +246,6 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
-
-
-@app.route("/chart")
-def chart():
-    dict = woerter
-
-    labels = []
-    values = []
-    for key in dict[4].keys():
-        labels.append(key)
-    for value in dict[4].values():
-        values.append(value)
-
-    high = values[0]
-    i = 0
-    for i in range(10):
-        if high % 10 == 0:
-            max = high
-            break
-        else:
-            high += 1
-            i += 1
-
-    return render_template('chart.html', values=values, labels=labels, max=max)
 
 
 def errorhandler(e):
