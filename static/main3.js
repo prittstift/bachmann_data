@@ -58,7 +58,7 @@ function createVis(parentElement, countData, autorData) {
     // Use ordinal scale since the x axis isn't numerical
     let xOrdinalScale = d3.scaleBand()
         .rangeRound([0, width])
-        .padding(.025)
+        .padding(.1)
         .domain(countData.map(function(datum){return datum.key}));
 
     let yScale = d3.scaleLinear()
