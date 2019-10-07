@@ -182,6 +182,27 @@ def login():
         return render_template("login.html")
 
 
+@app.route("/landchart")
+def landchart():
+    """Show chart of countries"""
+
+    return render_template("landchart.html")
+
+
+@app.route("/ortchart")
+def ortchart():
+    """Show chart of cities"""
+
+    return render_template("ortchart.html")
+
+
+@app.route("/alterchart")
+def alterchart():
+    """Show chart of ages"""
+
+    return render_template("alterchart.html")
+
+
 @app.route("/kritchart")
 def kritchart():
     """Show chart of critics"""

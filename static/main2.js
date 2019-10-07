@@ -20,7 +20,7 @@ function compileData(error, autorData, preisData) {
     // 347 albums
     // {albumID, title, artistID}
     console.log("author data", autorData);
-    console.log("price data",preisData);
+    console.log("price data", preisData);
 
     // Iterate through the albums and count the occurences of an artistID
     // it's an array of {key, value}, 204 items
@@ -120,14 +120,15 @@ function getAutorInfo(kritikername, autorData){
     // Get artist name
     document.querySelector("#kritiker-span").innerHTML = kritikername;
 
+
     // Construct list of albums for that artist
-    let ul_list = "<ul>";
+    let ul_list = "<table class=\"table table-striped\"><thead><tr><th scope=\"col\">Autor</th><th scope=\"col\">Preis</th><th scope=\"col\">Jahr</th><th scope=\"col\">*</th></tr></thead><tbody>";
   autorData.forEach(function(autor){
         if (autor.eingeladen_von === kritikername && autor.preis_gewonnen === "True") {
-          ul_list += "<li>" + autor.autorinnenname + ": " + autor.titel + " (" + autor.teilnahmejahr + ")" + "</li>";
+          ul_list += "<tr><td>" + autor.autorinnenname +  "</td><td>" +  autor.preis +  "</td><td>" +  autor.teilnahmejahr + "</td><td><a class=\"btn btn-primary\" href=\"/text/" + autor.id + "\" role=\"button\">Details</a></tr>";
         }
     })
-    ul_list += "</ul>";
+    ul_list += "</tbody></table>";
 
     // Put that html string into the dom
     document.querySelector("#autorinnen").innerHTML = ul_list;
