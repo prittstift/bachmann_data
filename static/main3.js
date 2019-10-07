@@ -33,6 +33,7 @@ function compileData(error, autorData) {
        return a.value - b.value;
     });
 
+    console.log("wohnort count", countByLand);
     // Now that the data has laoded, we can make the visualization
     createVis("chart-display-col", countByLand, autorData);
 

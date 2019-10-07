@@ -29,6 +29,9 @@ function compileData(error, autorData) {
        return a.value - b.value;
     });
 
+    countByAlter.splice(0, 22);
+
+    console.log("wohnort count", countByAlter);
     // Now that the data has laoded, we can make the visualization
     createVis("chart-display-col", countByAlter, autorData);
 

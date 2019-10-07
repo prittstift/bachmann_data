@@ -33,6 +33,9 @@ function compileData(error, autorData) {
        return a.value - b.value;
     });
 
+    countByWohnort.splice(0, 19);
+
+    console.log("wohnort count", countByWohnort);
     // Now that the data has laoded, we can make the visualization
     createVis("chart-display-col", countByWohnort, autorData);
 
