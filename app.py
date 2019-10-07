@@ -145,6 +145,32 @@ def text(search_result):
     return render_template("text2.html", results=results, labels=labels, values=values, max=max)
 
 
+@app.route("/woerterchart", methods=["GET"])
+def woerterchart():
+    """Show chart of words"""
+
+    dict = woerter
+
+    labels = []
+    values = []
+    for key in dict[84].keys():
+        labels.append(key)
+    for value in dict[84].values():
+        values.append(value)
+
+    high = values[0]
+    i = 0
+    for i in range(10):
+        if high % 10 == 0:
+            max = high
+            break
+        else:
+            high += 1
+            i += 1
+
+    return render_template("woerter.html", labels=labels, values=values, max=max)
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""

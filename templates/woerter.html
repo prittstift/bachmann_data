@@ -5,28 +5,7 @@
 {% endblock %}
 
 {% block main %}
-{% if results %}
-{% for result in results %}
-<h4 class="display-4"><strong>{{ result.autorinnenname }}</strong><br><em>{{ result.titel }}</em> ({{ result.teilnahmejahr }})</h4>
-<br>
-<br>
-<dl class="row">
-  <dt class="col-sm-3 text-left"><a href="/landchart">Land</a></dt>
-  <dd class="col-sm-9 text-left">{{ result.land }}</dd>
-
-  <dt class="col-sm-3 text-left"><a href="/ortchart">Wohnort</a></dt>
-  <dd class="col-sm-9 text-left">{{ result.wohnort }}</dd>
-
-  <dt class="col-sm-3 text-left"><a href="/alterchart">Geburtsjahr</a></dt>
-  <dd class="col-sm-9 text-left">{{ result.geburtsjahr }}</dd>
-
-  <dt class="col-sm-3 text-left"><a href="/kritchart">Eingeladen von</a></dt>
-  <dd class="col-sm-9 text-left">{{ result.eingeladen_von }}</dd>
-
-  <dt class="col-sm-3 text-left">Preise gewonnen?</dt>
-  <dd class="col-sm-9 text-left">{{ result.preis }}</dd>
-</dl>
-<h6 class="display-6"><a href="/woerterchart">Worthäufigkeit</a></h6>
+<h6 class="display-6">Worthäufigkeit insgesamt</h6>
 <canvas id="chart" width="600" height="400"></canvas>
 
 <script>
@@ -65,6 +44,4 @@
         scaleShowLabels: true
    });
 </script>
-{% endfor %}
-{% endif %}
 {% endblock %}
