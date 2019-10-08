@@ -1,5 +1,5 @@
 * {
-    font-family: "Poppins", sans-serif;;
+    font-family: "Poppins", sans-serif;
   }
 
 nav .navbar-brand
@@ -89,3 +89,10 @@ svg {
     fill: rgba(110, 205, 255, 0.54);
     background-color: white;
 }
+
+.container-canvas {
+        /* This could be done in one single declaration. See the extended sample. */
+        margin-right: auto;
+        margin-left: auto;
+        width: 600px;
+    }

@@ -16,24 +16,28 @@ function compileData(error, autorData) {
 
     // Iterate through the albums and count the occurences of an artistID
     // it's an array of {key, value}, 204 items
-    let countByAlter = d3.nest()
-        .key(function(datum) {return (Number(datum.teilnahmejahr) - Number(datum.geburtsjahr))
-        })
+    let countByWohnort = d3.nest()
+        .key(function(datum) {
+          if (datum.wohnort.includes(",")) {
+            l = datum.wohnort.split(",")
+            return l[0], l[1]}
+          else {return datum.wohnort}
+          })
         .rollup(function(leaves) {
             return leaves.length
         }) // the leaves are an array full of the objects with the corresponding key
         .entries(autorData);
 
     // Sort the data in ascending order
-    countByAlter.sort(function(a,b) {
+    countByWohnort.sort(function(a,b) {
        return a.value - b.value;
     });
 
-    countByAlter.splice(0, 22);
+    countByWohnort.splice(0, 19);
 
-    console.log("wohnort count", countByAlter);
+    console.log("wohnort count", countByWohnort);
     // Now that the data has laoded, we can make the visualization
-    createVis("chart-display-col", countByAlter, autorData);
+    createVis("chart-display-col", countByWohnort, autorData);
 
 
 }
@@ -57,7 +61,7 @@ function createVis(parentElement, countData, autorData) {
     // Use ordinal scale since the x axis isn't numerical
     let xOrdinalScale = d3.scaleBand()
         .rangeRound([0, width])
-        .padding(.1)
+        .padding(.05)
         .domain(countData.map(function(datum){return datum.key}));
 
     let yScale = d3.scaleLinear()
@@ -111,15 +115,15 @@ function createVis(parentElement, countData, autorData) {
 
 }
 
-function getAutorInfo(alter, autorData){
+function getAutorInfo(wohnortname, autorData){
     // Get artist name
-    document.querySelector("#alter-span").innerHTML = alter + " Jahre";
+    document.querySelector("#wohnort-span").innerHTML = wohnortname;
 
 
     // Construct list of albums for that artist
     let ul_list = "<table class=\"table table-striped\"><thead><tr><th scope=\"col\">Autor</th><th scope=\"col\">Preis</th><th scope=\"col\">Jahr</th><th scope=\"col\">*</th></tr></thead><tbody>";
   autorData.forEach(function(autor){
-        if ((Number(autor.teilnahmejahr) - Number(autor.geburtsjahr)) === Number(alter)  && autor.preis_gewonnen === "True") {
+        if (autor.wohnort.includes(wohnortname)  && autor.preis_gewonnen === "True") {
           ul_list += "<tr><td>" + autor.autorinnenname +  "</td><td>" +  autor.preis +  "</td><td>" +  autor.teilnahmejahr + "</td><td><a class=\"btn btn-primary\" href=\"/text/" + autor.id + "\" role=\"button\">Details</a></tr>";
         }
     })

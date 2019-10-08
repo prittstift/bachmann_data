@@ -2,49 +2,43 @@
 // Load the data
 queue()
     .defer(d3.csv, "static/autorinnen.csv")
-    .defer(d3.csv, "static/preise.csv")
     .await(compileData);
 
-function compileData(error, autorData, preisData) {
+function compileData(error, autorData) {
     // Make sure no error loading data
     if (error){
         return console.log(error);
     }
 
-    // Create map between artist ID and the name
-    let autorMap = {};
-    autorData.forEach(function(autorObj) {
-        autorMap[autorObj.eingeladen_von] = autorObj.eingeladen_von;
-    });
-
     // 347 albums
     // {albumID, title, artistID}
     console.log("author data", autorData);
-    console.log("price data", preisData);
 
     // Iterate through the albums and count the occurences of an artistID
     // it's an array of {key, value}, 204 items
-    let countByEingeladen = d3.nest()
-        .key(function(datum) { return datum.eingeladen_von})
+    let countByAlter = d3.nest()
+        .key(function(datum) {return (Number(datum.teilnahmejahr) - Number(datum.geburtsjahr))
+        })
         .rollup(function(leaves) {
             return leaves.length
         }) // the leaves are an array full of the objects with the corresponding key
         .entries(autorData);
 
-    console.log("kritiker count", countByEingeladen);
-
     // Sort the data in ascending order
-    countByEingeladen.sort(function(a,b) {
+    countByAlter.sort(function(a,b) {
        return a.value - b.value;
     });
 
+    countByAlter.splice(0, 22);
+
+    console.log("wohnort count", countByAlter);
     // Now that the data has laoded, we can make the visualization
-    createVis("chart-display-col", countByEingeladen, autorMap, autorData);
+    createVis("chart-display-col", countByAlter, autorData);
 
 
 }
 
-function createVis(parentElement, countData, autorMap, autorData) {
+function createVis(parentElement, countData, autorData) {
     // Configure margins
     let margin = { top: 20, right: 20, bottom: 90, left: 30 };
 
@@ -63,8 +57,8 @@ function createVis(parentElement, countData, autorMap, autorData) {
     // Use ordinal scale since the x axis isn't numerical
     let xOrdinalScale = d3.scaleBand()
         .rangeRound([0, width])
-        .padding(.1)
-        .domain(d3.map(countData, function(datum){return autorMap[datum.key]}).keys());
+        .padding(.05)
+        .domain(countData.map(function(datum){return datum.key}));
 
     let yScale = d3.scaleLinear()
         .range([height - margin.bottom, margin.top]) // we could also set this to height and 0, but would need to translate axis
@@ -76,6 +70,7 @@ function createVis(parentElement, countData, autorMap, autorData) {
 
     let barXAxis = d3.axisBottom()
         .scale(xOrdinalScale);
+
 
     // Append the axes to the svg
     let barYAxisGroup = svg.append("g")
@@ -108,23 +103,23 @@ function createVis(parentElement, countData, autorMap, autorData) {
             return yScale(datum.value);
         })
         .attr("x", function(datum){
-            return xOrdinalScale(autorMap[datum.key]);
+            return xOrdinalScale(datum.key);
         })
         .on("click", function(datum){
-            getAutorInfo(autorMap[datum.key], autorData);
+            getAutorInfo(datum.key, autorData);
         });
 
 }
 
-function getAutorInfo(kritikername, autorData){
+function getAutorInfo(alter, autorData){
     // Get artist name
-    document.querySelector("#kritiker-span").innerHTML = kritikername;
+    document.querySelector("#alter-span").innerHTML = alter + " Jahre";
 
 
     // Construct list of albums for that artist
     let ul_list = "<table class=\"table table-striped\"><thead><tr><th scope=\"col\">Autor</th><th scope=\"col\">Preis</th><th scope=\"col\">Jahr</th><th scope=\"col\">*</th></tr></thead><tbody>";
   autorData.forEach(function(autor){
-        if (autor.eingeladen_von === kritikername && autor.preis_gewonnen === "True") {
+        if ((Number(autor.teilnahmejahr) - Number(autor.geburtsjahr)) === Number(alter)  && autor.preis_gewonnen === "True") {
           ul_list += "<tr><td>" + autor.autorinnenname +  "</td><td>" +  autor.preis +  "</td><td>" +  autor.teilnahmejahr + "</td><td><a class=\"btn btn-primary\" href=\"/text/" + autor.id + "\" role=\"button\">Details</a></tr>";
         }
     })
