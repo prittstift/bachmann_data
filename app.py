@@ -87,7 +87,7 @@ def index():
             t = tuple(ids)
 
             if ids == []:
-                return apology("must provide exact word / word does not appear in texts", 400)
+                return apology("must provide exact word OR word does not appear in texts", 400)
             else:
                 # Query database for username
                 rows = db.execute("SELECT * FROM autorinnen WHERE id IN :id",
