@@ -77,6 +77,24 @@ def index():
 
             return prepare_preresults(rows)
 
+        elif request.form.get("word"):
+
+            ids = []
+            for i in range(1, len(woerter)):
+                for key in woerter[i].keys():
+                    if key == request.form.get("word").lower():
+                        ids.append(i)
+            t = tuple(ids)
+
+            if ids == []:
+                return apology("must provide exact word / word does not appear in texts", 400)
+            else:
+                # Query database for username
+                rows = db.execute("SELECT * FROM autorinnen WHERE id IN :id",
+                                  {"id": t}).fetchall()
+
+                return prepare_preresults(rows)
+
         else:
             return apology("must provide input for year, title, author or invited_by", 400)
     else:
@@ -275,7 +293,7 @@ def register():
 
         # db.execute failure?
         result = db.execute("INSERT INTO users (username, hash) VALUES (:username, :hash)", {
-                            "username": username, "hash": hash})
+            "username": username, "hash": hash})
         db.commit()
         if not result:
             return apology("Username already taken!", 400)
