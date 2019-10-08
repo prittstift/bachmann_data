@@ -7,6 +7,7 @@
 {% block main %}
 <h6 class="display-6">Worthäufigkeit insgesamt</h6>
 <canvas id="myChart" width="600" height="600"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 <script>
       var ctx = document.getElementById('myChart').getContext('2d');
 
@@ -18,7 +19,7 @@
                       "{{ item }}",
                      {% endfor %}],
               datasets: [{
-                  label: "Auftreten in allen Wettbewerbstexten",
+                  label: "Worthäufigkeit",
                   data: [
                     {% for item in values %}
                      "{{ item }}",
