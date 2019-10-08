@@ -86,14 +86,14 @@ alles = "mutter (360); augen (350); hand (337); kopf (283); vater (256); zeit (2
 # weitere Wörter:  wasser (151); kleine (148); paar (148); weit (148); gerade (143); hände (142); boden (139); kurz (139); luft (139); welt (139); kinder (137); mund (137); stehen (137); haut (129); jahre (129); lässt (129); fenster (127); moment (126); himmel (122); bett (120); licht (120); mensch (119); dachte (118); genau (115); endlich (114); 1 (111); mädchen (111); wohnung (111); stadt (110); jahren (108)
 
 autor_id_wrong = {albig: 38, baar: 68, beyer: 14, birkhan: 11, birnbacher: 8, bjerg: 23, clavadetscher: 16, dinic: 45, dorian: 53, dündar: 27, dürr:  36, edelbauer: 15, falkner: 63, federer: 6, fischer: 12, flor: 75, fritsch: 61, ganzoni: 80, gardi: 51, gericke: 81, gerster: 5, goetsch: 33, gomringer: 58, grigorcea: 70, groetzner: 26, groß: 19, halter: 67, heier: 76, heitzler: 9, jost: 4, klein: 21, klemm: 74, krohn: 64, kummer: 10, lange: 59, lehn: 50, lohse: 17, loß: 28, macht: 44, maljartschuk: 22, mannhart: 42, marchel: 71,
-                  markovic: 35, meschik: 13, fehr: 79, molinari: 40, neft: 24, nickel: 39, nolte: 25, obexer: 41, othmann: 7, otoo: 54, özdogan: 47, peschka: 29, petz: 83, poelzl: 77, poladjan: 57, präauer: 69, preiwuß: 72, recker: 60, rönne: 66, rubinowitz: 82,  sargnagel: 43, schenk: 52, schmalz: 34, schneider_b: 46, schneider_n: 32, schultens: 1, schwitter: 65, sievers: 20, snela: 49, sommer: 73, sozio: 55, stern: 18, thomae: 37, treber: 30, truschner: 62, tschui: 3, varatharajah: 78, wipauer: 2, wolf: 48, wray: 31, zwicky: 56, alles: 84}
+                  markovic: 35, meschik: 13, fehr: 79, molinari: 40, neft: 24, nickel: 39, nolte: 25, obexer: 41, othmann: 7, otoo: 54, özdogan: 47, peschka: 29, petz: 83, poelzl: 77, poladjan: 57, präauer: 69, preiwuß: 72, recker: 60, rönne: 66, rubinowitz: 82,  sargnagel: 43, schenk: 52, schmalz: 34, schneider_b: 46, schneider_n: 32, schultens: 1, schwitter: 65, sievers: 20, snela: 49, sommer: 73, sozio: 55, stern: 18, thomae: 37, treber: 30, truschner: 62, tschui: 3, varatharajah: 78, wipauer: 2, wolf: 48, wray: 31, zwicky: 56, alles: 0}
 autoren = [albig, baar, beyer, birkhan, birnbacher, bjerg, clavadetscher, dinic, dorian, dündar, dürr, edelbauer, falkner, federer, fischer, flor, fritsch, ganzoni, gardi, gericke, gerster, goetsch, gomringer, grigorcea, groetzner, groß, halter, heier, heitzler, jost, klein, klemm, krohn, kummer, lange, lehn, lohse, loß, macht, maljartschuk, mannhart, marchel,
            markovic, meschik, fehr, molinari, neft, nickel, nolte, obexer, othmann, otoo, özdogan, peschka, petz, poelzl, poladjan, präauer, preiwuß, recker, rönne, rubinowitz,  sargnagel, schenk, schmalz, schneider_b, schneider_n, schultens, schwitter, sievers, snela, sommer, sozio, stern, thomae, treber, truschner, tschui, varatharajah, wipauer, wolf, wray, zwicky, alles]
 
 woerter = {y: x for x, y in autor_id_wrong.items()}
 
 i = 1
-for i in range(1, (len(woerter) + 1)):
+for i in range(0, len(woerter)):
     autor_split = woerter[i].split("; ")
     autor_split2 = []
     for item in autor_split:

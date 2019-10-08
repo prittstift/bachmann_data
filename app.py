@@ -153,9 +153,9 @@ def woerterchart():
 
     labels = []
     values = []
-    for key in dict[84].keys():
+    for key in dict[0].keys():
         labels.append(key)
-    for value in dict[84].values():
+    for value in dict[0].values():
         values.append(value)
 
     high = values[0]
