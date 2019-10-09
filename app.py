@@ -77,6 +77,14 @@ def index():
 
             return prepare_preresults(rows)
 
+        elif request.form.get("price"):
+
+            # Query database for username
+            rows = db.execute("SELECT * FROM autorinnen JOIN preise ON autorinnen.autorinnenname = preise.autorinnenname AND preistitel = :preis", {
+                              "preis": request.form.get("price")}).fetchall()
+
+            return prepare_preresults(rows)
+
         elif request.form.get("word"):
 
             ids = []
