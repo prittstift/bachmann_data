@@ -41,10 +41,10 @@ nav .navbar-brand .green
 main .form-control
 {
     /* center form controls */
-    display: inline-block;
+    /* display: inline-block;  */
 
     /* override Bootstrap's 100% width for form controls */
-    width: auto;
+    /*width: auto; */
 }
 
 main
