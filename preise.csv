@@ -1,34 +1,34 @@
-teilnahmejahr,preistitel,preisgeld_in_euro,autorinnenname
-2014,Ingeborg-Bachmann-Preis,25000,Tex Rubinowitz
-2014,Kelag-Preis,10000,Michael Fehr
-2014,3sat-Preis,7500,Senthuran Varatharajah
-2014,Ernst-Willner-Preis,5000,Katharina Gericke
-2014,BKS Bank-Publikumspreis,7000,Gertraud Klemm
-2015,Ingeborg-Bachmann-Preis,25000,Nora Gomringer
-2015,Kelag-Preis,10000,Valerie Fritsch
-2015,3sat-Preis,7500,Dana Grigorcea
-2015,Stadtschreiber-Stipendium der Stadt Klagenfurt,5000,Valerie Fritsch
-2015,BKS Bank-Publikumspreis,7000,Valerie Fritsch
-2016,Ingeborg-Bachmann-Preis,25000,Sharon Dodua Otoo
-2016,Kelag-Preis,10000,Dieter Zwicky
-2016,3sat-Preis,7500,Julia Wolf
-2016,Stadtschreiber-Stipendium der Stadt Klagenfurt,5000,Stefanie Sargnagel
-2016,BKS Bank-Publikumspreis,7000,Stefanie Sargnagel
-2017,Ingeborg-Bachmann-Preis,25000,Ferdinand Schmalz
-2017,Deutschlandfunk-Preis,12500,John Wray
-2017,Kelag-Preis,10000,Eckhart Nickel
-2017,3sat-Preis,7500,Gianna Molinari
-2017,Stadtschreiber-Stipendium der Stadt Klagenfurt,5000,Karin Peschka
-2017,BKS Bank-Publikumspreis,7000,Karin Peschka
-2018,Ingeborg-Bachmann-Preis,25000,Tanja Maljartschuk
-2018,Deutschlandfunk-Preis,12500,Bov Bjerg
-2018,Kelag-Preis,10000,Özlem Özgül Dündar
-2018,3sat-Preis,7500,Anna Stern
-2018,Stadtschreiber-Stipendium der Stadt Klagenfurt,5000,Raphaela Edelbauer
-2018,BKS Bank-Publikumspreis,7000,Raphaela Edelbauer
-2019,Ingeborg-Bachmann-Preis,25000,Birgit Birnbacher
-2019,Deutschlandfunk-Preis,12500,Leander Fischer
-2019,Kelag-Preis,10000,Julia Jost
-2019,3sat-Preis,7500,Yannic Han Biao Federer
-2019,Stadtschreiber-Stipendium der Stadt Klagenfurt,5000,Ronya Othmann
-2019,BKS Bank-Publikumspreis,7000,Ronya Othmann
+teilnahmejahr,preistitel,preisgeld_in_euro,autorinnen_id
+2014,Ingeborg-Bachmann-Preis,25000,82
+2014,Kelag-Preis,10000,79
+2014,3sat-Preis,7500,78
+2014,Ernst-Willner-Preis,5000,81
+2014,BKS Bank-Publikumspreis,7000,74
+2015,Ingeborg-Bachmann-Preis,25000,58
+2015,Kelag-Preis,10000,61
+2015,3sat-Preis,7500,70
+2015,Stadtschreiber-Stipendium der Stadt Klagenfurt,5000,61
+2015,BKS Bank-Publikumspreis,7000,61
+2016,Ingeborg-Bachmann-Preis,25000,54
+2016,Kelag-Preis,10000,56
+2016,3sat-Preis,7500,48
+2016,Stadtschreiber-Stipendium der Stadt Klagenfurt,5000,43
+2016,BKS Bank-Publikumspreis,7000,43
+2017,Ingeborg-Bachmann-Preis,25000,34
+2017,Deutschlandfunk-Preis,12500,31
+2017,Kelag-Preis,10000,39
+2017,3sat-Preis,7500,40
+2017,Stadtschreiber-Stipendium der Stadt Klagenfurt,5000,29
+2017,BKS Bank-Publikumspreis,7000,29
+2018,Ingeborg-Bachmann-Preis,25000,22
+2018,Deutschlandfunk-Preis,12500,23
+2018,Kelag-Preis,10000,27
+2018,3sat-Preis,7500,18
+2018,Stadtschreiber-Stipendium der Stadt Klagenfurt,5000,15
+2018,BKS Bank-Publikumspreis,7000,15
+2019,Ingeborg-Bachmann-Preis,25000,8
+2019,Deutschlandfunk-Preis,12500,12
+2019,Kelag-Preis,10000,4
+2019,3sat-Preis,7500,6
+2019,Stadtschreiber-Stipendium der Stadt Klagenfurt,5000,7
+2019,BKS Bank-Publikumspreis,7000,7

@@ -80,7 +80,8 @@ def index():
         elif request.form.get("price"):
 
             # Query database for username
-            rows = db.execute("SELECT * FROM autorinnen JOIN preise ON autorinnen.autorinnenname = preise.autorinnenname AND preistitel = :preis", {
+
+            rows = db.execute("SELECT autorinnen.id, autorinnen.autorinnenname, autorinnen.titel, autorinnen.eingeladen_von, autorinnen.teilnahmejahr FROM autorinnen JOIN preise ON autorinnen.id = preise.autorinnen_id AND preistitel = :preis", {
                               "preis": request.form.get("price")}).fetchall()
 
             return prepare_preresults(rows)
@@ -135,8 +136,8 @@ def text(search_result):
             self.wohnort = rows[i]["wohnort"]
             self.geburtsjahr = rows[i]["geburtsjahr"]
             if rows[i]["preis_gewonnen"] == "True":
-                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnenname = :name",
-                                         {"name": rows[i]["autorinnenname"]}).fetchall()
+                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
+                                         {"name": rows[i]["id"]}).fetchall()
                 self.preis = ""
                 for j in range(len(rows_prices)):
                     self.preis += rows_prices[j]["preistitel"]
