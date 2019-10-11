@@ -314,7 +314,7 @@ def laender():
         else:
             values_price.append(rows_preis[k]["preis_true"])
         values_bachmann.append(bachmann)
-        if rows_preis[k]["total"] < 10:
+        if rows_preis_percent[k]["id"] not in range(1, 4):
             temp_percent.append(round(rows_preis_percent[k]["percent"], 2))
         else:
             labels_percent.append(rows_preis_percent[k]["land"])
