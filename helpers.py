@@ -22,6 +22,29 @@ def prepare_preresults(rows):
     return render_template("search.html", results=results)
 
 
+def prepare_chartdata(rows_preis, rows_preis_percent):
+
+    labels = []
+    values_priceless = []
+    values_price = []
+    labels_percent = []
+    values_percent = []
+    values_bachmann = []
+    for k in range(len(rows_preis)):
+        labels.append(rows_preis[k]["kritikerin"])
+        values_priceless.append(rows_preis[k]["preis_false"])
+        bachmann = rows_preis[k]["bachmann_preis"]
+        if bachmann != 0:
+            values_price.append((rows_preis[k]["preis_true"] - bachmann))
+        else:
+            values_price.append(rows_preis[k]["preis_true"])
+        values_bachmann.append(bachmann)
+        labels_percent.append(rows_preis_percent[k]["kritikerin"])
+        values_percent.append(round(rows_preis_percent[k]["percent"], 2))
+
+    return labels, values_priceless, values_price, labels_percent, values_percent, values_bachmann
+
+
 def apology(message, code=400):
     """Render message as an apology to user."""
     def escape(s):

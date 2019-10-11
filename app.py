@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, request, session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import apology, login_required, prepare_preresults
+from helpers import apology, login_required, prepare_preresults, prepare_chartdata
 from woerter import woerter
 import os
 import collections
@@ -259,6 +259,147 @@ def kritikerinnen():
     return render_template("kritikerinnen.html", results=results, labels=labels, values_priceless=values_priceless, values_price=values_price, values_bachmann=values_bachmann, labels_percent=labels_percent, values_percent=values_percent)
 
 
+@app.route("/laender", methods=["GET"])
+def laender():
+    """Show chart of countries"""
+
+    rows = db.execute("SELECT * FROM autorinnen").fetchall()
+
+    class FoundText:
+        def __init__(self, rows, i):
+            self.autorinnenname = rows[i]["autorinnenname"]
+            self.titel = rows[i]["titel"]
+            self.eingeladen_von = rows[i]["eingeladen_von"]
+            self.teilnahmejahr = rows[i]["teilnahmejahr"]
+            self.id = rows[i]["id"]
+            self.land = rows[i]["land"]
+            self.wohnort = rows[i]["wohnort"]
+            self.geburtsjahr = rows[i]["geburtsjahr"]
+            if rows[i]["preis_gewonnen"] == "True":
+                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
+                                         {"name": rows[i]["id"]}).fetchall()
+                self.preis = ""
+                for j in range(len(rows_prices)):
+                    self.preis += rows_prices[j]["preistitel"]
+                    if (j >= 0) and (j < (len(rows_prices) - 1)):
+                        self.preis += ", "
+                    if rows_prices[j]["preistitel"] == "Ingeborg-Bachmann-Preis":
+                        self.bachmann = True
+                    else:
+                        self.bachmann = False
+            else:
+                self.preis = "Fehlanzeige"
+
+    results = []
+    for i in range(len(rows)):
+        results.append(FoundText(rows, i))
+
+    rows_preis = db.execute("SELECT * FROM landpreis ORDER BY total DESC").fetchall()
+
+    rows_preis_percent = db.execute("SELECT * FROM landpreis ORDER BY percent DESC").fetchall()
+
+    labels = []
+    values_priceless = []
+    values_price = []
+    labels_percent = []
+    values_percent = []
+    values_bachmann = []
+    temp_percent = []
+    for k in range(len(rows_preis)):
+        labels.append(rows_preis[k]["land"])
+        values_priceless.append(rows_preis[k]["preis_false"])
+        bachmann = rows_preis[k]["bachmann_preis"]
+        if bachmann != 0:
+            values_price.append((rows_preis[k]["preis_true"] - bachmann))
+        else:
+            values_price.append(rows_preis[k]["preis_true"])
+        values_bachmann.append(bachmann)
+        if rows_preis[k]["total"] < 10:
+            temp_percent.append(round(rows_preis_percent[k]["percent"], 2))
+        else:
+            labels_percent.append(rows_preis_percent[k]["land"])
+            values_percent.append(round(rows_preis_percent[k]["percent"], 2))
+    temp_avg = 0
+    for percent in temp_percent:
+        temp_avg += percent
+        average_percent_other_countries = temp_avg / len(temp_percent)
+    labels_percent.append("andere Länder")
+    values_percent.append(round(average_percent_other_countries, 2))
+
+    return render_template("laender.html", results=results, labels=labels, values_priceless=values_priceless, values_price=values_price, values_bachmann=values_bachmann, labels_percent=labels_percent, values_percent=values_percent)
+
+
+@app.route("/orte", methods=["GET"])
+def orte():
+    """Show chart of cities"""
+
+    rows = db.execute("SELECT * FROM autorinnen").fetchall()
+
+    class FoundText:
+        def __init__(self, rows, i):
+            self.autorinnenname = rows[i]["autorinnenname"]
+            self.titel = rows[i]["titel"]
+            self.eingeladen_von = rows[i]["eingeladen_von"]
+            self.teilnahmejahr = rows[i]["teilnahmejahr"]
+            self.id = rows[i]["id"]
+            self.land = rows[i]["land"]
+            self.wohnort = rows[i]["wohnort"]
+            self.geburtsjahr = rows[i]["geburtsjahr"]
+            if rows[i]["preis_gewonnen"] == "True":
+                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
+                                         {"name": rows[i]["id"]}).fetchall()
+                self.preis = ""
+                for j in range(len(rows_prices)):
+                    self.preis += rows_prices[j]["preistitel"]
+                    if (j >= 0) and (j < (len(rows_prices) - 1)):
+                        self.preis += ", "
+                    if rows_prices[j]["preistitel"] == "Ingeborg-Bachmann-Preis":
+                        self.bachmann = True
+                    else:
+                        self.bachmann = False
+            else:
+                self.preis = "Fehlanzeige"
+
+    results = []
+    for i in range(len(rows)):
+        results.append(FoundText(rows, i))
+
+    rows_preis = db.execute("SELECT * FROM ortpreis ORDER BY total DESC").fetchall()
+
+    rows_preis_percent = db.execute("SELECT * FROM ortpreis ORDER BY percent DESC").fetchall()
+
+    labels = []
+    values_priceless = []
+    values_price = []
+    labels_percent = []
+    values_percent = []
+    values_bachmann = []
+    temp_percent = []
+    for k in range(len(rows_preis)):
+        if rows_preis[k]["total"] > 1:
+            labels.append(rows_preis[k]["ort"])
+            values_priceless.append(rows_preis[k]["preis_false"])
+            bachmann = rows_preis[k]["bachmann_preis"]
+            if bachmann != 0:
+                values_price.append((rows_preis[k]["preis_true"] - bachmann))
+            else:
+                values_price.append(rows_preis[k]["preis_true"])
+            values_bachmann.append(bachmann)
+        if rows_preis_percent[k]["ort"] in labels:
+            labels_percent.append(rows_preis_percent[k]["ort"])
+            values_percent.append(round(rows_preis_percent[k]["percent"], 2))
+        else:
+            temp_percent.append(round(rows_preis_percent[k]["percent"], 2))
+    temp_avg = 0
+    for percent in temp_percent:
+        temp_avg += percent
+        average_percent_other_countries = temp_avg / len(temp_percent)
+    labels_percent.append("andere Orte")
+    values_percent.append(round(average_percent_other_countries, 2))
+
+    return render_template("orte.html", results=results, labels=labels, values_priceless=values_priceless, values_price=values_price, values_bachmann=values_bachmann, labels_percent=labels_percent, values_percent=values_percent)
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
@@ -296,13 +437,6 @@ def login():
         return render_template("login.html")
 
 
-@app.route("/landchart")
-def landchart():
-    """Show chart of countries"""
-
-    return render_template("landchart.html")
-
-
 @app.route("/ortchart")
 def ortchart():
     """Show chart of cities"""
@@ -315,13 +449,6 @@ def alterchart():
     """Show chart of ages"""
 
     return render_template("alterchart.html")
-
-
-@app.route("/kritchart")
-def kritchart():
-    """Show chart of critics"""
-
-    return render_template("kritchart.html")
 
 
 @app.route("/logout")
