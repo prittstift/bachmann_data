@@ -1,0 +1,124 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Suchergebnisse
+{% endblock %}
+
+{% block main %}
+    <div class="header">
+        <h2>Bachmannpreis (2014-2019)</h2>
+    </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="container-canvas"><canvas id="stackedChart" width="600" height="400"></canvas></div>
+      </div>
+      <div class="row">
+        <div class="container-canvas"><canvas id="horizontalBar" width="600" height="400"></canvas></div>
+      </div>
+    </div>
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+            <script>
+
+                  var ctx = document.getElementById('stackedChart').getContext('2d');
+
+                  var kritikerChart = new Chart(ctx, {
+                      type: 'bar',
+                      data: {
+                          labels:  [
+                                 {% for item in labels %}
+                                  "{{ item }}",
+                                 {% endfor %}],
+                          datasets: [{
+                              label: "Bachmann-Preis gewonnen",
+                              data: [
+                                {% for item in values_bachmann %}
+                                 "{{ item }}",
+                                {% endfor %}],
+                              backgroundColor: 'rgba(231, 53, 234, 0.2)',
+                              borderColor: 'rgba(231, 53, 234, 1)',
+                              borderWidth: 1
+                          },
+                          {
+                              label: "andere Preise gewonnen",
+                              data: [
+                                {% for item in values_price %}
+                                 "{{ item }}",
+                                {% endfor %}],
+                              backgroundColor: 'rgba(53, 90, 234, 0.2)',
+                              borderColor: 'rgba(53, 90, 234, 1)',
+                              borderWidth: 1
+                          },
+                          {
+                            label: "keinen Preis gewonnen",
+                            data: [
+                              {% for item in values_priceless %}
+                               "{{ item }}",
+                              {% endfor %}],
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                          }]
+                      },
+                      options: {
+                          title: {
+                            display: true,
+                            text: "Kritikerinnen und gewonnene Preise"
+                          },
+                          tooltips: {
+                            mode: "index",
+                            intersect: false
+                          },
+                          legend: {
+                            display: false,
+                            },
+                          scales: {
+                            xAxes: [{
+                                  stacked: true
+                                  }],
+                              yAxes: [{
+                                  stacked: true,
+                              }]
+                          }
+                      }
+                  });
+
+                  var ctx = document.getElementById('horizontalBar').getContext('2d');
+
+                  var percentChart = new Chart(ctx, {
+                      type: 'horizontalBar',
+                      data: {
+                          labels:  [
+                                 {% for item in labels_percent %}
+                                  "{{ item }}",
+                                 {% endfor %}],
+                          datasets: [{
+                              label: "Preis gewonnen",
+                              data: [
+                                {% for item in values_percent %}
+                                 "{{ item }}",
+                                {% endfor %}],
+                              backgroundColor: 'rgba(53, 90, 234, 0.2)',
+                              borderColor: 'rgba(53, 90, 234, 1)',
+                              borderWidth: 1
+                          }]
+                      },
+                      options: {
+                        title: {
+                          display: true,
+                          text: "Kritikerinnen und Gewinnquote"
+                        },
+                        legend: {
+                            display: false,
+                            },
+                          scales: {
+                              xAxes: [{
+                                  ticks: {
+                                      beginAtZero: true
+                                  }
+                              }]
+                          }
+                      }
+                  });
+            </script>
+{% endblock %}
