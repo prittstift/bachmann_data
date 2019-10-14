@@ -46,10 +46,22 @@ def index():
 
         # Ensure username was submitted
         if request.form.get("year"):
+            if request.form.get("year") == "2019":
+                temp = "3006"
+            if request.form.get("year") == "2018":
+                temp = "0807"
+            if request.form.get("year") == "2017":
+                temp = "0907"
+            if request.form.get("year") == "2016":
+                temp = "0307"
+            if request.form.get("year") == "2015":
+                temp = "0507"
+            if request.form.get("year") == "2014":
+                temp = "0607"
 
             # Query database for username
             rows = db.execute("SELECT * FROM autorinnen WHERE teilnahmejahr = :year", {
-                              "year": str(request.form.get("year"))}).fetchall()
+                              "year": (temp + str(request.form.get("year")))}).fetchall()
 
             return prepare_preresults(rows)
 
