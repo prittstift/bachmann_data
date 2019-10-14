@@ -386,7 +386,7 @@ def orte():
             else:
                 values_price.append(rows_preis[k]["preis_true"])
             values_bachmann.append(bachmann)
-        if rows_preis_percent[k]["ort"] in labels:
+        if rows_preis_percent[k]["total"] > 1:
             labels_percent.append(rows_preis_percent[k]["ort"])
             values_percent.append(round(rows_preis_percent[k]["percent"], 2))
         else:
