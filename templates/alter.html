@@ -1,0 +1,183 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Suchergebnisse
+{% endblock %}
+
+{% block main %}
+    <div class="header">
+        <h2>Bachmannpreis (2014-2019)</h2>
+    </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="container-canvas"><canvas id="scatterChart" width="400" height="400"></canvas></div>
+      </div>
+      <div class="row">
+        <div class="container-canvas"><canvas id="lineChart" width="600" height="400"></canvas></div>
+      </div>
+    </div>
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+            <script>
+
+              var kein_Preis = {{ kein_Preis }};
+              var andere_Preise = {{ andere_Preise }};
+              var bachmannpreis = {{ bachmannpreis }};
+              function generateData(list) {
+                  var data = [];
+                  for (var i = 0; i < list.length; i++)
+                  data.push({
+                      x: list[i]['True'],
+                      y: list[i]['False'],
+                  })
+                  return data;
+              }
+
+              var ctx = document.getElementById('scatterChart').getContext('2d');
+
+              var scatterChart = new Chart(ctx, {
+                  type: 'scatter',
+                  data: {
+                      datasets: [{
+                          label: "kein Preis",
+                          borderColor: 'rgba(54, 162, 235, 1)',
+                          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                          data: generateData(kein_Preis)
+                      },{
+                        label: "andere Preise",
+                        borderColor: 'rgba(53, 90, 234, 1)',
+                        backgroundColor: 'rgba(53, 90, 234, 0.2)',
+                        data: generateData(andere_Preise)
+                      }, {
+                        label: "Bachmann-Preis",
+                        borderColor: 'rgba(231, 53, 234, 1)',
+                        backgroundColor: 'rgba(231, 53, 234, 0.2)',
+                        data: generateData(bachmannpreis)
+                      }
+                      ]
+                  },
+                  options: {
+                      showLines: false,
+                      title: {
+                          display: true,
+                          text: "Alter der Autorinnen verteilt nach Teilnahmejahren"
+                      },
+                          scales: {
+                              yAxes: [{
+                                  ticks: {
+                                    max: 62,
+                                    min: 22,
+                                    stepSize: 2
+                                  }
+                              }],
+                              xAxes: [{
+                                  ticks: {
+                                    max: 2019,
+                                    min: 2013,
+                                    stepSize: 1
+                                  },
+                                  type: 'linear',
+                                  position: 'bottom'
+                              }]
+                          }
+                  }
+              });
+              var preise = {{ preise }};
+              var alter = {{ alter }};
+              function generateAvg(list) {
+                  var data = [];
+                  var a = 0;
+                  var b = 0;
+                  var c = 0;
+                  var d = 0;
+                  var e = 0;
+                  var f = 0;
+                  var g = 0;
+                  var h = 0;
+                  var j = 0;
+                  var k = 0;
+                  var l = 0;
+                  var m = 0;
+                  for (var i = 0; i < list.length; i++) {
+                    if (list[i]['True'] === 2014) {
+                        a += list[i]['False'];
+                        g++
+                    };
+                    if (list[i]['True'] === 2015) {
+                        b += list[i]['False'];
+                        h++
+                    };
+                    if (list[i]['True'] === 2016) {
+                        c += list[i]['False'];
+                        j++
+                    };
+                    if (list[i]['True'] === 2017) {
+                        d += list[i]['False'];
+                        k++
+                    };
+                    if (list[i]['True'] === 2018) {
+                        e += list[i]['False'];
+                        l++
+                    };
+                    if (list[i]['True'] === 2019) {
+                        f += list[i]['False'];
+                        m++
+                    };
+                  }
+                  data.push(Math.round((a / g) * 100) / 100);
+                  data.push(Math.round((b / h) * 100) / 100);
+                  data.push(Math.round((c / j) * 100) / 100);
+                  data.push(Math.round((d / k) * 100) / 100);
+                  data.push(Math.round((e / l) * 100) / 100);
+                  data.push(Math.round((f / m) * 100) / 100);
+                  return data;
+              }
+
+              var ctx = document.getElementById('lineChart').getContext('2d');
+
+              var myChart = new Chart(ctx, {
+                  type: 'line',
+                  data: {
+                      labels: [2014, 2015, 2016, 2017, 2018, 2019],
+                      datasets: [{
+                          label: 'Durchschnitt (Preis gewonnen)',
+                          data: generateAvg(preise),
+                          fill: false,
+                          backgroundColor: 'rgba(53, 90, 234, 0.2)',
+                          borderColor: 'rgba(53, 90, 234, 1)',
+                          borderWidth: 1
+                      }, {
+                          label: 'Durchschnitt (insgesamt)',
+                          data: generateAvg(alter),
+                          fill: false,
+                          backgroundColor: 'rgba(53, 234, 156, 0.2)',
+                          borderColor: 'rgba(53, 234, 156, 1)',
+                          borderWidth: 1
+                      }, {
+                          label: 'Publikumspreis',
+                          data: {{ publikum }},
+                          fill: false,
+                          backgroundColor: 'rgba(234, 138, 53, 0.2)',
+                          borderColor: 'rgba(234, 138, 53, 1)',
+                          borderWidth: 1
+                      }]
+                  },
+                  options: {
+                      title: {
+                          display: true,
+                          text: "Durchschnittliches Alter der Autorinnen nach Teilnahmejahren"
+                      },
+                      scales: {
+                          yAxes: [{
+                              ticks: {
+                                  beginAtZero: true,
+                                  max: 60,
+                                  min: 20
+                              }
+                          }]
+                      }
+                  }
+              });
+
+            </script>
+{% endblock %}

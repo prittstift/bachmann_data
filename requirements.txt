@@ -15,6 +15,7 @@ colorama==0.4.1
 cs50==3.1.0
 cssselect==1.0.3
 cycler==0.10.0
+datetime==4.3
 decorator==4.4.0
 defusedxml==0.6.0
 dill==0.3.0

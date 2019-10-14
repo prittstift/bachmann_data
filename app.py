@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, request, session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import apology, login_required, prepare_preresults, prepare_chartdata
+from helpers import apology, login_required, prepare_preresults, prepare_chartdata, prepare_age, prepare_year
 from woerter import woerter
 import os
 import collections
@@ -131,11 +131,12 @@ def text(search_result):
             self.autorinnenname = rows[i]["autorinnenname"]
             self.titel = rows[i]["titel"]
             self.eingeladen_von = rows[i]["eingeladen_von"]
-            self.teilnahmejahr = rows[i]["teilnahmejahr"]
+            self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
             self.id = rows[i]["id"]
             self.land = rows[i]["land"]
             self.wohnort = rows[i]["wohnort"]
-            self.geburtsjahr = rows[i]["geburtsjahr"]
+            self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
+            self.link = rows[i]["webseite"]
             if rows[i]["preis_gewonnen"] == "True":
                 rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
                                          {"name": rows[i]["id"]}).fetchall()
@@ -210,11 +211,11 @@ def kritikerinnen():
             self.autorinnenname = rows[i]["autorinnenname"]
             self.titel = rows[i]["titel"]
             self.eingeladen_von = rows[i]["eingeladen_von"]
-            self.teilnahmejahr = rows[i]["teilnahmejahr"]
+            self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
             self.id = rows[i]["id"]
             self.land = rows[i]["land"]
             self.wohnort = rows[i]["wohnort"]
-            self.geburtsjahr = rows[i]["geburtsjahr"]
+            self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
             if rows[i]["preis_gewonnen"] == "True":
                 rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
                                          {"name": rows[i]["id"]}).fetchall()
@@ -270,11 +271,11 @@ def laender():
             self.autorinnenname = rows[i]["autorinnenname"]
             self.titel = rows[i]["titel"]
             self.eingeladen_von = rows[i]["eingeladen_von"]
-            self.teilnahmejahr = rows[i]["teilnahmejahr"]
+            self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
             self.id = rows[i]["id"]
             self.land = rows[i]["land"]
             self.wohnort = rows[i]["wohnort"]
-            self.geburtsjahr = rows[i]["geburtsjahr"]
+            self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
             if rows[i]["preis_gewonnen"] == "True":
                 rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
                                          {"name": rows[i]["id"]}).fetchall()
@@ -340,11 +341,11 @@ def orte():
             self.autorinnenname = rows[i]["autorinnenname"]
             self.titel = rows[i]["titel"]
             self.eingeladen_von = rows[i]["eingeladen_von"]
-            self.teilnahmejahr = rows[i]["teilnahmejahr"]
+            self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
             self.id = rows[i]["id"]
             self.land = rows[i]["land"]
             self.wohnort = rows[i]["wohnort"]
-            self.geburtsjahr = rows[i]["geburtsjahr"]
+            self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
             if rows[i]["preis_gewonnen"] == "True":
                 rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
                                          {"name": rows[i]["id"]}).fetchall()
@@ -400,6 +401,86 @@ def orte():
     return render_template("orte.html", results=results, labels=labels, values_priceless=values_priceless, values_price=values_price, values_bachmann=values_bachmann, labels_percent=labels_percent, values_percent=values_percent)
 
 
+@app.route("/alter", methods=["GET"])
+def alter():
+    """Show chart of ages"""
+
+    rows = db.execute("SELECT * FROM autorinnen").fetchall()
+
+    class FoundText:
+        def __init__(self, rows, i):
+            self.autorinnenname = rows[i]["autorinnenname"]
+            self.titel = rows[i]["titel"]
+            self.eingeladen_von = rows[i]["eingeladen_von"]
+            self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
+            self.id = rows[i]["id"]
+            self.land = rows[i]["land"]
+            self.wohnort = rows[i]["wohnort"]
+            self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
+            self.alter = prepare_age(rows[i]["geburtsjahr"], rows[i]["teilnahmejahr"])
+            if rows[i]["preis_gewonnen"] == "True":
+                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
+                                         {"name": rows[i]["id"]}).fetchall()
+                self.preis = ""
+                for j in range(len(rows_prices)):
+                    self.preis += rows_prices[j]["preistitel"]
+                    if (j >= 0) and (j < (len(rows_prices) - 1)):
+                        self.preis += ", "
+                    if rows_prices[j]["preistitel"] == "Ingeborg-Bachmann-Preis":
+                        self.bachmann = True
+                    else:
+                        self.bachmann = False
+                    if rows_prices[j]["preistitel"] == "BKS Bank-Publikumspreis":
+                        self.publikum = True
+                    else:
+                        self.publikum = False
+            else:
+                self.preis = "Fehlanzeige"
+                self.bachmann = False
+
+    results = []
+    for i in range(len(rows)):
+        results.append(FoundText(rows, i))
+
+    kein_Preis = []
+    bachmannpreis = []
+    andere_Preise = []
+    preise = []
+    alter = []
+    publikum_temp = []
+    for result in results:
+        dict = {}
+        dict[True] = result.teilnahmejahr
+        dict[False] = result.alter
+        alter.append(dict)
+        if result.preis == "Fehlanzeige":
+            dict = {}
+            dict[True] = result.teilnahmejahr
+            dict[False] = result.alter
+            kein_Preis.append(dict)
+        if result.preis != "Fehlanzeige":
+            dict = {}
+            dict[True] = result.teilnahmejahr
+            dict[False] = result.alter
+            preise.append(dict)
+            if result.publikum == True:
+                publikum_temp.append(result.alter)
+            if result.bachmann == True:
+                dict = {}
+                dict[True] = result.teilnahmejahr
+                dict[False] = result.alter
+                bachmannpreis.append(dict)
+            else:
+                dict = {}
+                dict[True] = result.teilnahmejahr
+                dict[False] = result.alter
+                andere_Preise.append(dict)
+
+    publikum = list(reversed(publikum_temp))
+
+    return render_template("alter.html", results=results, kein_Preis=kein_Preis, bachmannpreis=bachmannpreis, andere_Preise=andere_Preise, preise=preise, alter=alter, publikum=publikum)
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
@@ -435,20 +516,6 @@ def login():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("login.html")
-
-
-@app.route("/ortchart")
-def ortchart():
-    """Show chart of cities"""
-
-    return render_template("ortchart.html")
-
-
-@app.route("/alterchart")
-def alterchart():
-    """Show chart of ages"""
-
-    return render_template("alterchart.html")
 
 
 @app.route("/logout")

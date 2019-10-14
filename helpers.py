@@ -1,8 +1,25 @@
 import requests
 import urllib.parse
-
+import datetime
+from datetime import date
 from flask import redirect, render_template, request, session
 from functools import wraps
+
+
+def prepare_year(data):
+
+    year = datetime.datetime.strptime(data, '%d%m%Y').date().year
+    return year
+
+
+def prepare_age(birthday, year):
+
+    date_temp = datetime.datetime.strptime(birthday, '%d%m%Y').date()
+    year_temp = datetime.datetime.strptime(year, '%d%m%Y').date()
+    age_temp = year_temp - date_temp
+    age = float(age_temp.days) / 365.25
+    age = round(age, 2)
+    return age
 
 
 def prepare_preresults(rows):
@@ -12,7 +29,7 @@ def prepare_preresults(rows):
             self.autorinnenname = rows[i]["autorinnenname"]
             self.titel = rows[i]["titel"]
             self.eingeladen_von = rows[i]["eingeladen_von"]
-            self.teilnahmejahr = rows[i]["teilnahmejahr"]
+            self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
             self.id = rows[i]["id"]
 
     results = []
