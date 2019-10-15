@@ -131,7 +131,19 @@
                   data.push(Math.round((e / l) * 100) / 100);
                   data.push(Math.round((f / m) * 100) / 100);
                   return data;
-              }
+              };
+
+              function generateglobalAvg(list) {
+              var alter_avg = 0;
+              for (var i = 0; i < list.length; i++) {
+                alter_avg += list[i]};
+              alter_avg = Math.round((alter_avg / list.length) * 100 / 100)
+              data = []
+              for (var i = 0; i < list.length; i++) {
+                data.push(alter_avg)};
+              return data;
+            };
+
 
               var ctx = document.getElementById('lineChart').getContext('2d');
 
@@ -140,16 +152,38 @@
                   data: {
                       labels: [2014, 2015, 2016, 2017, 2018, 2019],
                       datasets: [{
-                          label: 'Durchschnitt (Preis gewonnen)',
+                          label: 'Preis gewonnen',
                           data: generateAvg(preise),
                           fill: false,
+                          showLine: false,
                           backgroundColor: 'rgba(53, 90, 234, 0.2)',
                           borderColor: 'rgba(53, 90, 234, 1)',
                           borderWidth: 1
                       }, {
-                          label: 'Durchschnitt (insgesamt)',
+                          label: 'Preis gewonnen (global)',
+                          data: generateglobalAvg(generateAvg(preise)),
+                          fill: false,
+                          borderDash: [5, 5],
+                          pointStyle: 'dash',
+                          pointRadius: 0,
+                          backgroundColor: 'rgba(53, 90, 234, 0.2)',
+                          borderColor: 'rgba(53, 90, 234, 1)',
+                          borderWidth: 1
+                      }, {
+                          label: 'alle Autorinnen',
                           data: generateAvg(alter),
                           fill: false,
+                          showLine: false,
+                          backgroundColor: 'rgba(53, 234, 156, 0.2)',
+                          borderColor: 'rgba(53, 234, 156, 1)',
+                          borderWidth: 1
+                      }, {
+                          label: 'alle Autorinnen (global)',
+                          data: generateglobalAvg(generateAvg(alter)),
+                          fill: false,
+                          borderDash: [5, 5],
+                          pointStyle: 'dash',
+                          pointRadius: 0,
                           backgroundColor: 'rgba(53, 234, 156, 0.2)',
                           borderColor: 'rgba(53, 234, 156, 1)',
                           borderWidth: 1
@@ -157,6 +191,17 @@
                           label: 'Publikumspreis',
                           data: {{ publikum }},
                           fill: false,
+                          showLine: false,
+                          backgroundColor: 'rgba(234, 138, 53, 0.2)',
+                          borderColor: 'rgba(234, 138, 53, 1)',
+                          borderWidth: 1
+                      },  {
+                          label: 'Publikumspreis (global)',
+                          data: [{%for datum in publikum %}{{ publikum_avg }}, {% endfor %}],
+                          fill: false,
+                          borderDash: [5, 5],
+                          pointStyle: 'dash',
+                          pointRadius: 0,
                           backgroundColor: 'rgba(234, 138, 53, 0.2)',
                           borderColor: 'rgba(234, 138, 53, 1)',
                           borderWidth: 1

@@ -460,6 +460,7 @@ def alter():
     preise = []
     alter = []
     publikum_temp = []
+    publikum_avg = 0
     for result in results:
         dict = {}
         dict[True] = result.teilnahmejahr
@@ -477,6 +478,7 @@ def alter():
             preise.append(dict)
             if result.publikum == True:
                 publikum_temp.append(result.alter)
+                publikum_avg += result.alter
             if result.bachmann == True:
                 dict = {}
                 dict[True] = result.teilnahmejahr
@@ -489,8 +491,9 @@ def alter():
                 andere_Preise.append(dict)
 
     publikum = list(reversed(publikum_temp))
+    publikum_avg = round((publikum_avg / len(publikum)), 2)
 
-    return render_template("alter.html", results=results, kein_Preis=kein_Preis, bachmannpreis=bachmannpreis, andere_Preise=andere_Preise, preise=preise, alter=alter, publikum=publikum)
+    return render_template("alter.html", results=results, kein_Preis=kein_Preis, bachmannpreis=bachmannpreis, andere_Preise=andere_Preise, preise=preise, alter=alter, publikum=publikum, publikum_avg=publikum_avg)
 
 
 @app.route("/login", methods=["GET", "POST"])
