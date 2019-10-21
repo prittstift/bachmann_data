@@ -9,6 +9,8 @@ import os
 import collections
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+from spacy_sentiws import spaCySentiWS
+import spacy
 
 app = Flask(__name__)
 
@@ -183,7 +185,35 @@ def text(search_result):
             high += 1
             i += 1
 
-    return render_template("text2.html", results=results, labels=labels, values=values, max=max)
+    autorin_id = rows[0]["id"]
+
+    rows_fazit = db.execute("SELECT fazit FROM juryfazit WHERE autorin_id = :id",
+                            {"id": int(autorin_id)}).fetchall()
+    fazit = rows_fazit[0]["fazit"]
+
+    if autorin_id in range(1, 15):
+        rows_short = db.execute("SELECT kritikerin, shortlist_kritiker, eingeladen FROM shortlist WHERE autorin_id = :id",
+                                {"id": int(autorin_id)}).fetchall()
+
+        class ShortList:
+            def __init__(self, rows_short):
+                self.vote = []
+                for j in range(len(rows_short)):
+                    if rows_short[j]["shortlist_kritiker"] == "True":
+                        self.vote.append("true")
+                    if rows_short[j]["shortlist_kritiker"] == "False":
+                        if rows_short[j]["eingeladen"] == "True":
+                            self.vote.append(0)
+                        else:
+                            self.vote.append("false")
+                    else:
+                        pass
+
+        shortlist = ShortList(rows_short)
+
+        return render_template("text2.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit, shortlist=shortlist)
+    else:
+        return render_template("text2.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit)
 
 
 @app.route("/woerterchart", methods=["GET"])
@@ -494,6 +524,12 @@ def alter():
     publikum_avg = round((publikum_avg / len(publikum)), 2)
 
     return render_template("alter.html", results=results, kein_Preis=kein_Preis, bachmannpreis=bachmannpreis, andere_Preise=andere_Preise, preise=preise, alter=alter, publikum=publikum, publikum_avg=publikum_avg)
+
+
+@app.route("/pie", methods=["GET", "POST"])
+def pie():
+    if request.method == "GET":
+        return render_template("pie.html")
 
 
 @app.route("/login", methods=["GET", "POST"])

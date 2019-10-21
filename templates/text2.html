@@ -7,31 +7,70 @@
 {% block main %}
 {% if results %}
 {% for result in results %}
-<h4 class="display-4"><strong>{{ result.autorinnenname }}</strong><br><em>{{ result.titel }}</em> ({{ result.teilnahmejahr }})</h4>
-<br>
-<br>
-<dl class="row">
-  <dt class="col-sm-3 text-left"><a href="/laender">Land</a></dt>
-  <dd class="col-sm-9 text-left">{{ result.land }}</dd>
+<div class="row">
+  <div class="col">
+    <p class="text-center text-secondary">
+      {% if  search_result != "1" %}<a href="/text/{{ search_result  - 1}}" class="card-link">Vorherige Autorin</a> {% endif %} I {% if  search_result != "83" %}<a href="/text/{{ search_result + 1 }}" class="card-link">Nächste Autorin</a> {% endif %}</p>
+    <h4 class="display-4"><strong>{{ result.autorinnenname }}</strong><br><em>{{ result.titel }}</em> ({{ result.teilnahmejahr }})</h4>
+    <br>
+    <br>
+  </div>
+</div>
+<div class="row">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="container-fluid">
+          <dl class="row">
+            <dt class="col-sm-6 text-left"><a href="/laender" class="card-link">Land</a></dt>
+            <dd class="col-sm-6 text-left">{{ result.land }}</dd>
 
-  <dt class="col-sm-3 text-left"><a href="/orte">Wohnort</a></dt>
-  <dd class="col-sm-9 text-left">{{ result.wohnort }}</dd>
+            <dt class="col-sm-6 text-left"><a href="/orte" class="card-link">Wohnort</a></dt>
+            <dd class="col-sm-6 text-left">{{ result.wohnort }}</dd>
 
-  <dt class="col-sm-3 text-left"><a href="/alter">Geburtsjahr</a></dt>
-  <dd class="col-sm-9 text-left">{{ result.geburtsjahr }}</dd>
+            <dt class="col-sm-6 text-left"><a href="/alter" class="card-link">Geburtsjahr</a></dt>
+            <dd class="col-sm-6 text-left">{{ result.geburtsjahr }}</dd>
 
-  <dt class="col-sm-3 text-left"><a href="/kritikerinnen">Eingeladen von</a></dt>
-  <dd class="col-sm-9 text-left">{{ result.eingeladen_von }}</dd>
+            <dt class="col-sm-6 text-left"><a href="/kritikerinnen" class="card-link">Eingeladen von</a></dt>
+            <dd class="col-sm-6 text-left">{{ result.eingeladen_von }}</dd>
 
-  <dt class="col-sm-3 text-left">Preise gewonnen?</dt>
-  <dd class="col-sm-9 text-left">{{ result.preis }}</dd>
-  <p>&nbsp;</p>
-  <p>&nbsp;</p>
-  <p>&nbsp;</p>
-  <a class="btn btn-primary" href="{{ result.link }}"  target="_blank" role="button">Webseite</a>
-</dl>
-<h6 class="display-6"><a href="/woerterchart">Worthäufigkeit</a></h6>
-<div class="container-canvas"><canvas id="myChart" width="600" height="400"></canvas></div>
+            <dt class="col-sm-6 text-left">Preise gewonnen?</dt>
+            <dd class="col-sm-6 text-left">{{ result.preis }}</dd>
+
+            <dt class="col-sm-6 text-left">Link</dt>
+            <dd class="col-sm-6 text-left"><a class="btn btn-primary col-auto text-left" href="{{ result.link }}"  target="_blank" role="button">Webseite</a></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="row">
+          <div class="col">
+            {% if shortlist %}
+            <h6 class="display-6">für Shortlist gewählt?</h6>
+            <div class="container-canvas">
+              <canvas id="pieChart" style="display: block; height: 50px; width: 200px;"></canvas>
+            </div>
+            <br>
+            {% endif %}
+            <p class="text-center text-secondary font-italic">„{{ fazit }}“</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <br>
+    <br>
+    <h6 class="display-6 text-center"><a href="/woerterchart" class="card-link">Worthäufigkeit</a></h6>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="container-canvas"><canvas id="myChart" height="400" width="600"></canvas></div>
+  </div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
       <script>
       var ctx = document.getElementById('myChart').getContext('2d');
@@ -66,6 +105,79 @@
                 }
             }
         });
+
+        {% if shortlist %}
+        var tooltip_list = [];
+        var colors = [];
+        var border_colors = []
+        {% for item in shortlist.vote %}
+        if ({{ item }} === true) {
+          tooltip_list.push( "ja");
+          colors.push( "rgba(53, 234, 156, 0.5)");
+          border_colors.push( "rgba(53, 234, 156, 1)");
+        };
+        if ({{ item }} === false) {
+          tooltip_list.push( "nein");
+          colors.push("rgba(234, 53, 75, 0.5)");
+          border_colors.push("rgba(234, 53, 75, 1)");
+        };
+        if ({{ item }} === 0) {
+          tooltip_list.push( "eingeladen");
+          colors.push("rgba(53, 90, 234, 0.5)");
+          border_colors.push("rgba(53, 90, 234, 1)");
+        };
+        {% endfor %}
+
+        var config_pie = {
+          type: "doughnut",
+          data: {
+            datasets: [{
+              data: [
+              1, 1, 1, 1, 1, 1, 1
+              ],
+              backgroundColor: colors,
+              borderColor: border_colors,
+              borderWidth: 1
+            }],
+            labels: [
+            "Stefan Gmünder",
+            "Nora Gomringer",
+            "Klaus Kastberger",
+            "Hildegard E. Keller",
+            "Michael Wiederstein",
+            "Insa Wilke",
+            "Hubert Winkels"
+            ]
+          },
+          options: {
+            responsive: true,
+            legend: {
+              display: false
+            },
+            animation: {
+              animateScale: true,
+              animateRotate: true
+            },
+            tooltips: {
+                callbacks: {
+                  label: function(tooltipItem, data) {
+                      var label = data.labels[tooltipItem.index] || '';
+
+                      if (label) {
+                          label += ": " + tooltip_list[tooltipItem.index];
+                      };
+                      return label;
+                    }
+                }
+              }
+          }
+        };
+
+        window.onload = function() {
+          var ctx_pie = document.getElementById('pieChart').getContext('2d');
+          window.myPie = new Chart(ctx_pie, config_pie);
+        };
+        {% endif %}
         </script>
 {% endfor %}
 {% endif %}
