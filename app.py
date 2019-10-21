@@ -9,8 +9,7 @@ import os
 import collections
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-from spacy_sentiws import spaCySentiWS
-import spacy
+
 
 app = Flask(__name__)
 
