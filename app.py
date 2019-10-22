@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, request, session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import apology, login_required, prepare_preresults, prepare_chartdata, prepare_age, prepare_year
+from helpers import apology, login_required, get_search_data, prepare_preresults, prepare_chartdata, prepare_age, prepare_year
 from woerter import woerter
 import os
 import collections
@@ -45,92 +45,33 @@ Session(app)
 def index():
     if request.method == "POST":
 
-        # Ensure username was submitted
-        if request.form.get("year"):
-            if request.form.get("year") == "2019":
-                temp = "3006"
-            if request.form.get("year") == "2018":
-                temp = "0807"
-            if request.form.get("year") == "2017":
-                temp = "0907"
-            if request.form.get("year") == "2016":
-                temp = "0307"
-            if request.form.get("year") == "2015":
-                temp = "0507"
-            if request.form.get("year") == "2014":
-                temp = "0607"
+        criteria = ["year", "title", "author", "invited_by", "price", "word"]
 
-            # Query database for username
-            rows = db.execute("SELECT * FROM autorinnen WHERE teilnahmejahr = :year", {
-                              "year": (temp + str(request.form.get("year")))}).fetchall()
+        for criterion in criteria:
+            # Search by criterion
+            if request.form.get(criterion):
 
-            return prepare_preresults(rows)
+                search_term = request.form.get(criterion)
 
-        # Ensure username was submitted
-        elif request.form.get("title"):
-
-            # Query database for username
-            rows = db.execute("SELECT * FROM autorinnen WHERE titel ILIKE CONCAT ('%', :title, '%')",
-                              {"title": request.form.get("title")}).fetchall()
-
-            return prepare_preresults(rows)
-
-        elif request.form.get("author"):
-
-            # Query database for username
-            rows = db.execute("SELECT * FROM autorinnen WHERE autorinnenname ILIKE CONCAT ('%', :author, '%')",
-                              {"author": request.form.get("author")}).fetchall()
-
-            return prepare_preresults(rows)
-
-        elif request.form.get("invited_by"):
-
-            # Query database for username
-            rows = db.execute("SELECT * FROM autorinnen WHERE eingeladen_von ILIKE CONCAT ('%', :invited_by, '%')",
-                              {"invited_by": request.form.get("invited_by")}).fetchall()
-
-            return prepare_preresults(rows)
-
-        elif request.form.get("price"):
-
-            # Query database for username
-
-            rows = db.execute("SELECT autorinnen.id, autorinnen.autorinnenname, autorinnen.titel, autorinnen.eingeladen_von, autorinnen.teilnahmejahr FROM autorinnen JOIN preise ON autorinnen.id = preise.autorinnen_id AND preistitel = :preis", {
-                              "preis": request.form.get("price")}).fetchall()
-
-            return prepare_preresults(rows)
-
-        elif request.form.get("word"):
-
-            ids = []
-            for i in range(1, len(woerter)):
-                for key in woerter[i].keys():
-                    if key == request.form.get("word").lower():
-                        ids.append(i)
-            t = tuple(ids)
-
-            if ids == []:
-                return apology("must provide exact word OR word does not appear in texts", 400)
-            else:
-                # Query database for username
-                rows = db.execute("SELECT * FROM autorinnen WHERE id IN :id",
-                                  {"id": t}).fetchall()
-
-                return prepare_preresults(rows)
-
+                return redirect("/search/q={}&criterion={}".format(str(search_term), str(criterion)))
+        # Incorrect search
         else:
             return apology("must provide input for year, title, author or invited_by", 400)
+
+    # request method "GET"
     else:
         return render_template("index.html")
 
 
-@app.route("/search",  methods=["GET", "POST"])
+@app.route("/search/q=<string:search_term>&criterion=<string:criterion>",  methods=["GET"])
 # @login_required
-def search():
-    if request.method == "POST":
-        return render_template("text.html")
-    else:
-        return render_template("search.html")
+def search(search_term, criterion):
+
+    rows = get_search_data(search_term, criterion)
+
+    results = prepare_preresults(rows)
+
+    return render_template("search.html", results=results, criterion=criterion, search_term=search_term)
 
 
 @app.route("/text/<int:search_result>",  methods=["GET"])

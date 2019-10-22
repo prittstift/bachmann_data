@@ -50,16 +50,16 @@ main .form-control
 main
 {
     /* scroll horizontally as needed */
-    overflow-x: auto;
+    /* overflow-x: auto; */
 
     /* center contents */
-    text-align: center;
+    /* text-align: center; */
 }
 
 main img
 {
     /* constrain images on small screens */
-    max-width: 100%;
+    /* max-width: 100%; */
 }
 
 
@@ -71,28 +71,3 @@ main img
 .tab-content>.tab-pane.active {
     height: auto;
 }
-
-/* Style the parent containers */
-.row .col-md-6{
-    height: 500px;
-    padding: 0px;
-}
-
-
-#chart-display-col {
-    border-right: 4px hidden black;
-}
-
-
-/* Style svg components*/
-svg {
-    fill: rgba(110, 205, 255, 0.54);
-    background-color: white;
-}
-
-.container-canvas {
-        /* This could be done in one single declaration. See the extended sample. */
-        margin-right: auto;
-        margin-left: auto;
-        width: 600px;
-    }

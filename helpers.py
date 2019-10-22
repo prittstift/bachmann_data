@@ -4,6 +4,63 @@ import datetime
 from datetime import date
 from flask import redirect, render_template, request, session
 from functools import wraps
+from woerter import woerter
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+
+
+# Check for environment variable
+if not os.getenv("DATABASE_URL"):
+    raise RuntimeError("DATABASE_URL is not set")
+
+# Set up database
+engine = create_engine(os.getenv("DATABASE_URL"))
+db = scoped_session(sessionmaker(bind=engine))
+
+
+def get_search_data(search_term, criterion):
+
+    if criterion == "year":
+        days = {2019: "3006", 2018: "0807", 2017: "0907",
+                2016: "0307", 2015: "0507", 2014: "0607"}
+
+        rows = db.execute("SELECT * FROM autorinnen WHERE teilnahmejahr = :year", {
+                          "year": (days[int(search_term)] + str(search_term))}).fetchall()
+        return rows
+
+    elif criterion == "word":
+        ids = []
+        for i in range(1, len(woerter)):
+            for key in woerter[i].keys():
+                if key == search_term.lower():
+                    ids.append(i)
+        t = tuple(ids)
+
+        if ids == []:
+            # Incorrect search
+            return apology("must provide exact word OR word does not appear in texts", 400)
+        else:
+            # Query database
+            rows = db.execute("SELECT * FROM autorinnen WHERE id IN :id",
+                              {"id": t}).fetchall()
+            return rows
+    elif criterion == "price":
+        rows = db.execute("SELECT autorinnen.id, autorinnen.autorinnenname, autorinnen.titel, autorinnen.eingeladen_von, autorinnen.teilnahmejahr FROM autorinnen JOIN preise ON autorinnen.id = preise.autorinnen_id AND preistitel = :price", {
+                          "price": search_term}).fetchall()
+        return rows
+    else:
+        if criterion == "title":
+            sql_comparison = "titel ILIKE CONCAT ('%', :title, '%')"
+        elif criterion == "author":
+            sql_comparison = "autorinnenname ILIKE CONCAT ('%', :author, '%')"
+        elif criterion == "invited_by":
+            sql_comparison = "eingeladen_von = :invited_by"
+
+        rows = db.execute("SELECT * FROM autorinnen WHERE {}".format(sql_comparison), {
+                          "{}".format(criterion): search_term}).fetchall()
+
+        return rows
 
 
 def prepare_year(data):
@@ -36,7 +93,7 @@ def prepare_preresults(rows):
     for i in range(len(rows)):
         results.append(Preresult(rows, i))
 
-    return render_template("search.html", results=results)
+    return results
 
 
 def prepare_chartdata(rows_preis, rows_preis_percent):

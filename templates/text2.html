@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Suchergebnisse
+{% for result in results %}
+    {{ result.autorinnenname }} - {{ result.titel }}
+{% endfor %}
 {% endblock %}
 
 {% block main %}
@@ -10,70 +12,74 @@
 <div class="row">
   <div class="col">
     <p class="text-center text-secondary">
-      {% if  search_result != "1" %}<a href="/text/{{ search_result  - 1}}" class="card-link">Vorherige Autorin</a> {% endif %} I {% if  search_result != "83" %}<a href="/text/{{ search_result + 1 }}" class="card-link">Nächste Autorin</a> {% endif %}</p>
-    <h4 class="display-4"><strong>{{ result.autorinnenname }}</strong><br><em>{{ result.titel }}</em> ({{ result.teilnahmejahr }})</h4>
+      {% if  search_result != "1" %}<a href="/text/{{ search_result  - 1}}" class="card-link">Vorherige</a> {% endif %} {% if  search_result != "83" %}<a href="/text/{{ search_result + 1 }}" class="card-link">Nächste</a> {% endif %}</p>
+    <h4 class="display-4 text-center"><strong>{{ result.autorinnenname }}</strong><br><em>{{ result.titel }}</em> ({{ result.teilnahmejahr }})</h4>
     <br>
     <br>
   </div>
 </div>
 <div class="row">
-  <div class="container">
+  <div class="col-sm-6">
+    <dl class="row">
+      <dt class="col-sm-6 text-left"><a href="/laender" class="card-link">Land</a></dt>
+      <dd class="col-sm-6 text-left">{{ result.land }}</dd>
+
+      <dt class="col-sm-6 text-left"><a href="/orte" class="card-link">Wohnort</a></dt>
+      <dd class="col-sm-6 text-left">{{ result.wohnort }}</dd>
+
+      <dt class="col-sm-6 text-left"><a href="/alter" class="card-link">Geburtsjahr</a></dt>
+      <dd class="col-sm-6 text-left">{{ result.geburtsjahr }}</dd>
+
+      <dt class="col-sm-6 text-left"><a href="/kritikerinnen" class="card-link">Eingeladen von</a></dt>
+      <dd class="col-sm-6 text-left">{{ result.eingeladen_von }}</dd>
+
+      <dt class="col-sm-6 text-left">Preise gewonnen?</dt>
+      <dd class="col-sm-6 text-left">{{ result.preis }}</dd>
+
+      <dt class="col-sm-6 text-left">Link</dt>
+      <dd class="col-sm-6 text-left"><a class="btn btn-primary col-auto text-left" href="{{ result.link }}"  target="_blank" role="button">Webseite</a></dd>
+    </dl>
+  </div>
+  <div class="col-sm-6">
     <div class="row">
-      <div class="col-sm-6">
-        <div class="container-fluid">
-          <dl class="row">
-            <dt class="col-sm-6 text-left"><a href="/laender" class="card-link">Land</a></dt>
-            <dd class="col-sm-6 text-left">{{ result.land }}</dd>
-
-            <dt class="col-sm-6 text-left"><a href="/orte" class="card-link">Wohnort</a></dt>
-            <dd class="col-sm-6 text-left">{{ result.wohnort }}</dd>
-
-            <dt class="col-sm-6 text-left"><a href="/alter" class="card-link">Geburtsjahr</a></dt>
-            <dd class="col-sm-6 text-left">{{ result.geburtsjahr }}</dd>
-
-            <dt class="col-sm-6 text-left"><a href="/kritikerinnen" class="card-link">Eingeladen von</a></dt>
-            <dd class="col-sm-6 text-left">{{ result.eingeladen_von }}</dd>
-
-            <dt class="col-sm-6 text-left">Preise gewonnen?</dt>
-            <dd class="col-sm-6 text-left">{{ result.preis }}</dd>
-
-            <dt class="col-sm-6 text-left">Link</dt>
-            <dd class="col-sm-6 text-left"><a class="btn btn-primary col-auto text-left" href="{{ result.link }}"  target="_blank" role="button">Webseite</a></dd>
-          </dl>
-        </div>
+      <div class="col">
+        {% if shortlist %}
+        <h6 class="display-6 text-center">für Shortlist gewählt?</h6>
       </div>
-      <div class="col-sm-6">
-        <div class="row">
-          <div class="col">
-            {% if shortlist %}
-            <h6 class="display-6">für Shortlist gewählt?</h6>
-            <div class="container-canvas">
-              <canvas id="pieChart" style="display: block; height: 50px; width: 200px;"></canvas>
-            </div>
-            <br>
-            {% endif %}
-            <p class="text-center text-secondary font-italic">„{{ fazit }}“</p>
-          </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="container-canvas" style="position: relative; margin: auto; height:220px; width:220px">
+          <canvas id="doughnutChart"></canvas>
         </div>
       </div>
     </div>
   </div>
 </div>
+{% endif %}
+<br>
+<br>
 <div class="row">
   <div class="col">
-    <br>
-    <br>
+    <p class="text-center text-secondary font-italic">„{{ fazit }}“</p>
+  </div>
+</div>
+<br>
+<div class="row">
+  <div class="col">
     <h6 class="display-6 text-center"><a href="/woerterchart" class="card-link">Worthäufigkeit</a></h6>
   </div>
 </div>
 <div class="row">
   <div class="col">
-    <div class="container-canvas"><canvas id="myChart" height="400" width="600"></canvas></div>
+    <div class="container-canvas" style="position: relative; margin: auto; height:80vh; width:80vw">
+      <canvas id="horizontalChart"></canvas>
+    </div>
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
       <script>
-      var ctx = document.getElementById('myChart').getContext('2d');
+      var ctx = document.getElementById('horizontalChart').getContext('2d');
       var myChart = new Chart(ctx, {
             type: 'horizontalBar',
             data: {
@@ -93,6 +99,8 @@
                 }]
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 legend: {
                   display: false,
                   },
@@ -140,17 +148,17 @@
               borderWidth: 1
             }],
             labels: [
-            "Stefan Gmünder",
-            "Nora Gomringer",
-            "Klaus Kastberger",
-            "Hildegard E. Keller",
-            "Michael Wiederstein",
-            "Insa Wilke",
-            "Hubert Winkels"
+            "Gmünder",
+            "Gomringer",
+            "Kastberger",
+            "Keller",
+            "Wiederstein",
+            "Wilke",
+            "Winkels"
             ]
           },
           options: {
-            responsive: true,
+            responsive:true,
             legend: {
               display: false
             },
@@ -158,7 +166,14 @@
               animateScale: true,
               animateRotate: true
             },
+            layout: {
+                        padding: {
+                            right: 20,
+                            left: 20
+                        }
+                    },
             tooltips: {
+                tooltipCaretSize: 0,
                 callbacks: {
                   label: function(tooltipItem, data) {
                       var label = data.labels[tooltipItem.index] || '';
@@ -174,7 +189,7 @@
         };
 
         window.onload = function() {
-          var ctx_pie = document.getElementById('pieChart').getContext('2d');
+          var ctx_pie = document.getElementById('doughnutChart').getContext('2d');
           window.myPie = new Chart(ctx_pie, config_pie);
         };
         {% endif %}
