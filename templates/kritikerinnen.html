@@ -30,13 +30,13 @@
                       type: 'bar',
                       data: {
                           labels:  [
-                                 {% for item in labels %}
+                                 {% for item in chartdata.labels %}
                                   "{{ item }}",
                                  {% endfor %}],
                           datasets: [{
                               label: "Bachmann-Preis gewonnen",
                               data: [
-                                {% for item in values_bachmann %}
+                                {% for item in chartdata.values_bachmann %}
                                  "{{ item }}",
                                 {% endfor %}],
                               backgroundColor: 'rgba(231, 53, 234, 0.2)',
@@ -46,7 +46,7 @@
                           {
                               label: "andere Preise gewonnen",
                               data: [
-                                {% for item in values_price %}
+                                {% for item in chartdata.values_price %}
                                  "{{ item }}",
                                 {% endfor %}],
                               backgroundColor: 'rgba(53, 90, 234, 0.2)',
@@ -56,7 +56,7 @@
                           {
                             label: "keinen Preis gewonnen",
                             data: [
-                              {% for item in values_priceless %}
+                              {% for item in chartdata.values_priceless %}
                                "{{ item }}",
                               {% endfor %}],
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -98,13 +98,13 @@
                       type: 'horizontalBar',
                       data: {
                           labels:  [
-                                 {% for item in labels_percent %}
+                                 {% for item in chartdata.labels_percent %}
                                   "{{ item }}",
                                  {% endfor %}],
                           datasets: [{
                               label: "Preis gewonnen",
                               data: [
-                                {% for item in values_percent %}
+                                {% for item in chartdata.values_percent %}
                                  "{{ item }}",
                                 {% endfor %}],
                               backgroundColor: 'rgba(53, 90, 234, 0.2)',

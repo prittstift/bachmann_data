@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, request, session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import apology, login_required, get_search_data, prepare_preresults, prepare_chartdata, prepare_age, prepare_year
+from helpers import apology, login_required, get_search_data, prepare_results, prepare_barchart, prepare_age, prepare_year, prepare_woerterchart
 from woerter import woerter
 import os
 import collections
@@ -69,7 +69,7 @@ def search(search_term, criterion):
 
     rows = get_search_data(search_term, criterion)
 
-    results = prepare_preresults(rows)
+    results = prepare_results(rows, "search")
 
     return render_template("search.html", results=results, criterion=criterion, search_term=search_term)
 
@@ -80,50 +80,9 @@ def text(search_result):
     rows = db.execute("SELECT * FROM autorinnen WHERE autorinnen.id = :text_id",
                       {"text_id": search_result}).fetchall()
 
-    class FoundText:
-        def __init__(self, rows, i):
-            self.autorinnenname = rows[i]["autorinnenname"]
-            self.titel = rows[i]["titel"]
-            self.eingeladen_von = rows[i]["eingeladen_von"]
-            self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
-            self.id = rows[i]["id"]
-            self.land = rows[i]["land"]
-            self.wohnort = rows[i]["wohnort"]
-            self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
-            self.link = rows[i]["webseite"]
-            if rows[i]["preis_gewonnen"] == "True":
-                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
-                                         {"name": rows[i]["id"]}).fetchall()
-                self.preis = ""
-                for j in range(len(rows_prices)):
-                    self.preis += rows_prices[j]["preistitel"]
-                    if (j >= 0) and (j < (len(rows_prices) - 1)):
-                        self.preis += ", "
-            else:
-                self.preis = "Fehlanzeige"
+    results = prepare_results(rows, "text")
 
-    results = []
-    for i in range(len(rows)):
-        results.append(FoundText(rows, i))
-
-    dict = woerter
-
-    labels = []
-    values = []
-    for key in dict[rows[i]["id"]].keys():
-        labels.append(key)
-    for value in dict[rows[i]["id"]].values():
-        values.append(value)
-
-    high = values[0]
-    i = 0
-    for i in range(10):
-        if high % 10 == 0:
-            max = high
-            break
-        else:
-            high += 1
-            i += 1
+    labels, values, max = prepare_woerterchart(woerter, search_result)
 
     autorin_id = rows[0]["id"]
 
@@ -160,24 +119,8 @@ def text(search_result):
 def woerterchart():
     """Show chart of words"""
 
-    dict = woerter
-
-    labels = []
-    values = []
-    for key in dict[0].keys():
-        labels.append(key)
-    for value in dict[0].values():
-        values.append(value)
-
-    high = values[0]
-    i = 0
-    for i in range(10):
-        if high % 10 == 0:
-            max = high
-            break
-        else:
-            high += 1
-            i += 1
+    alles_id = 0
+    labels, values, max = prepare_woerterchart(woerter, alles_id)
 
     return render_template("woerter.html", labels=labels, values=values, max=max)
 
@@ -188,58 +131,15 @@ def kritikerinnen():
 
     rows = db.execute("SELECT * FROM autorinnen").fetchall()
 
-    class FoundText:
-        def __init__(self, rows, i):
-            self.autorinnenname = rows[i]["autorinnenname"]
-            self.titel = rows[i]["titel"]
-            self.eingeladen_von = rows[i]["eingeladen_von"]
-            self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
-            self.id = rows[i]["id"]
-            self.land = rows[i]["land"]
-            self.wohnort = rows[i]["wohnort"]
-            self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
-            if rows[i]["preis_gewonnen"] == "True":
-                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
-                                         {"name": rows[i]["id"]}).fetchall()
-                self.preis = ""
-                for j in range(len(rows_prices)):
-                    self.preis += rows_prices[j]["preistitel"]
-                    if (j >= 0) and (j < (len(rows_prices) - 1)):
-                        self.preis += ", "
-                    if rows_prices[j]["preistitel"] == "Ingeborg-Bachmann-Preis":
-                        self.bachmann = True
-                    else:
-                        self.bachmann = False
-            else:
-                self.preis = "Fehlanzeige"
-
-    results = []
-    for i in range(len(rows)):
-        results.append(FoundText(rows, i))
+    results = prepare_results(rows, "chart")
 
     rows_preis = db.execute("SELECT * FROM kritikerpreis ORDER BY total DESC").fetchall()
 
     rows_preis_percent = db.execute("SELECT * FROM kritikerpreis ORDER BY percent DESC").fetchall()
 
-    labels = []
-    values_priceless = []
-    values_price = []
-    labels_percent = []
-    values_percent = []
-    values_bachmann = []
-    for k in range(len(rows_preis)):
-        labels.append(rows_preis[k]["kritikerin"])
-        values_priceless.append(rows_preis[k]["preis_false"])
-        bachmann = rows_preis[k]["bachmann_preis"]
-        if bachmann != 0:
-            values_price.append((rows_preis[k]["preis_true"] - bachmann))
-        else:
-            values_price.append(rows_preis[k]["preis_true"])
-        values_bachmann.append(bachmann)
-        labels_percent.append(rows_preis_percent[k]["kritikerin"])
-        values_percent.append(round(rows_preis_percent[k]["percent"], 2))
+    chartdata = prepare_barchart("kritikerin", rows_preis, rows_preis_percent)
 
-    return render_template("kritikerinnen.html", results=results, labels=labels, values_priceless=values_priceless, values_price=values_price, values_bachmann=values_bachmann, labels_percent=labels_percent, values_percent=values_percent)
+    return render_template("kritikerinnen.html", results=results, chartdata=chartdata)
 
 
 @app.route("/laender", methods=["GET"])
@@ -248,68 +148,15 @@ def laender():
 
     rows = db.execute("SELECT * FROM autorinnen").fetchall()
 
-    class FoundText:
-        def __init__(self, rows, i):
-            self.autorinnenname = rows[i]["autorinnenname"]
-            self.titel = rows[i]["titel"]
-            self.eingeladen_von = rows[i]["eingeladen_von"]
-            self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
-            self.id = rows[i]["id"]
-            self.land = rows[i]["land"]
-            self.wohnort = rows[i]["wohnort"]
-            self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
-            if rows[i]["preis_gewonnen"] == "True":
-                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
-                                         {"name": rows[i]["id"]}).fetchall()
-                self.preis = ""
-                for j in range(len(rows_prices)):
-                    self.preis += rows_prices[j]["preistitel"]
-                    if (j >= 0) and (j < (len(rows_prices) - 1)):
-                        self.preis += ", "
-                    if rows_prices[j]["preistitel"] == "Ingeborg-Bachmann-Preis":
-                        self.bachmann = True
-                    else:
-                        self.bachmann = False
-            else:
-                self.preis = "Fehlanzeige"
-
-    results = []
-    for i in range(len(rows)):
-        results.append(FoundText(rows, i))
+    results = prepare_results(rows, "chart")
 
     rows_preis = db.execute("SELECT * FROM landpreis ORDER BY total DESC").fetchall()
 
     rows_preis_percent = db.execute("SELECT * FROM landpreis ORDER BY percent DESC").fetchall()
 
-    labels = []
-    values_priceless = []
-    values_price = []
-    labels_percent = []
-    values_percent = []
-    values_bachmann = []
-    temp_percent = []
-    for k in range(len(rows_preis)):
-        labels.append(rows_preis[k]["land"])
-        values_priceless.append(rows_preis[k]["preis_false"])
-        bachmann = rows_preis[k]["bachmann_preis"]
-        if bachmann != 0:
-            values_price.append((rows_preis[k]["preis_true"] - bachmann))
-        else:
-            values_price.append(rows_preis[k]["preis_true"])
-        values_bachmann.append(bachmann)
-        if rows_preis_percent[k]["id"] not in range(1, 4):
-            temp_percent.append(round(rows_preis_percent[k]["percent"], 2))
-        else:
-            labels_percent.append(rows_preis_percent[k]["land"])
-            values_percent.append(round(rows_preis_percent[k]["percent"], 2))
-    temp_avg = 0
-    for percent in temp_percent:
-        temp_avg += percent
-        average_percent_other_countries = temp_avg / len(temp_percent)
-    labels_percent.append("andere Länder")
-    values_percent.append(round(average_percent_other_countries, 2))
+    chartdata = prepare_barchart("land", rows_preis, rows_preis_percent)
 
-    return render_template("laender.html", results=results, labels=labels, values_priceless=values_priceless, values_price=values_price, values_bachmann=values_bachmann, labels_percent=labels_percent, values_percent=values_percent)
+    return render_template("laender.html", results=results, chartdata=chartdata)
 
 
 @app.route("/orte", methods=["GET"])
@@ -318,69 +165,15 @@ def orte():
 
     rows = db.execute("SELECT * FROM autorinnen").fetchall()
 
-    class FoundText:
-        def __init__(self, rows, i):
-            self.autorinnenname = rows[i]["autorinnenname"]
-            self.titel = rows[i]["titel"]
-            self.eingeladen_von = rows[i]["eingeladen_von"]
-            self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
-            self.id = rows[i]["id"]
-            self.land = rows[i]["land"]
-            self.wohnort = rows[i]["wohnort"]
-            self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
-            if rows[i]["preis_gewonnen"] == "True":
-                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
-                                         {"name": rows[i]["id"]}).fetchall()
-                self.preis = ""
-                for j in range(len(rows_prices)):
-                    self.preis += rows_prices[j]["preistitel"]
-                    if (j >= 0) and (j < (len(rows_prices) - 1)):
-                        self.preis += ", "
-                    if rows_prices[j]["preistitel"] == "Ingeborg-Bachmann-Preis":
-                        self.bachmann = True
-                    else:
-                        self.bachmann = False
-            else:
-                self.preis = "Fehlanzeige"
-
-    results = []
-    for i in range(len(rows)):
-        results.append(FoundText(rows, i))
+    results = prepare_results(rows, "chart")
 
     rows_preis = db.execute("SELECT * FROM ortpreis ORDER BY total DESC").fetchall()
 
     rows_preis_percent = db.execute("SELECT * FROM ortpreis ORDER BY percent DESC").fetchall()
 
-    labels = []
-    values_priceless = []
-    values_price = []
-    labels_percent = []
-    values_percent = []
-    values_bachmann = []
-    temp_percent = []
-    for k in range(len(rows_preis)):
-        if rows_preis[k]["total"] > 1:
-            labels.append(rows_preis[k]["ort"])
-            values_priceless.append(rows_preis[k]["preis_false"])
-            bachmann = rows_preis[k]["bachmann_preis"]
-            if bachmann != 0:
-                values_price.append((rows_preis[k]["preis_true"] - bachmann))
-            else:
-                values_price.append(rows_preis[k]["preis_true"])
-            values_bachmann.append(bachmann)
-        if rows_preis_percent[k]["total"] > 1:
-            labels_percent.append(rows_preis_percent[k]["ort"])
-            values_percent.append(round(rows_preis_percent[k]["percent"], 2))
-        else:
-            temp_percent.append(round(rows_preis_percent[k]["percent"], 2))
-    temp_avg = 0
-    for percent in temp_percent:
-        temp_avg += percent
-        average_percent_other_countries = temp_avg / len(temp_percent)
-    labels_percent.append("andere Orte")
-    values_percent.append(round(average_percent_other_countries, 2))
+    chartdata = prepare_barchart("ort", rows_preis, rows_preis_percent)
 
-    return render_template("orte.html", results=results, labels=labels, values_priceless=values_priceless, values_price=values_price, values_bachmann=values_bachmann, labels_percent=labels_percent, values_percent=values_percent)
+    return render_template("orte.html", results=results, chartdata=chartdata)
 
 
 @app.route("/alter", methods=["GET"])
@@ -389,40 +182,7 @@ def alter():
 
     rows = db.execute("SELECT * FROM autorinnen").fetchall()
 
-    class FoundText:
-        def __init__(self, rows, i):
-            self.autorinnenname = rows[i]["autorinnenname"]
-            self.titel = rows[i]["titel"]
-            self.eingeladen_von = rows[i]["eingeladen_von"]
-            self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
-            self.id = rows[i]["id"]
-            self.land = rows[i]["land"]
-            self.wohnort = rows[i]["wohnort"]
-            self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
-            self.alter = prepare_age(rows[i]["geburtsjahr"], rows[i]["teilnahmejahr"])
-            if rows[i]["preis_gewonnen"] == "True":
-                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
-                                         {"name": rows[i]["id"]}).fetchall()
-                self.preis = ""
-                for j in range(len(rows_prices)):
-                    self.preis += rows_prices[j]["preistitel"]
-                    if (j >= 0) and (j < (len(rows_prices) - 1)):
-                        self.preis += ", "
-                    if rows_prices[j]["preistitel"] == "Ingeborg-Bachmann-Preis":
-                        self.bachmann = True
-                    else:
-                        self.bachmann = False
-                    if rows_prices[j]["preistitel"] == "BKS Bank-Publikumspreis":
-                        self.publikum = True
-                    else:
-                        self.publikum = False
-            else:
-                self.preis = "Fehlanzeige"
-                self.bachmann = False
-
-    results = []
-    for i in range(len(rows)):
-        results.append(FoundText(rows, i))
+    results = prepare_results(rows, "chart")
 
     kein_Preis = []
     bachmannpreis = []

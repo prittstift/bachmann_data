@@ -79,9 +79,9 @@ def prepare_age(birthday, year):
     return age
 
 
-def prepare_preresults(rows):
+def prepare_results(rows, site):
 
-    class Preresult:
+    class Result:
         def __init__(self, rows, i):
             self.autorinnenname = rows[i]["autorinnenname"]
             self.titel = rows[i]["titel"]
@@ -89,34 +89,106 @@ def prepare_preresults(rows):
             self.teilnahmejahr = prepare_year(rows[i]["teilnahmejahr"])
             self.id = rows[i]["id"]
 
+            if (site == "text") or (site == "chart"):
+                self.land = rows[i]["land"]
+                self.wohnort = rows[i]["wohnort"]
+                self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
+                self.link = rows[i]["webseite"]
+                if rows[i]["preis_gewonnen"] == "True":
+                    rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
+                                             {"name": rows[i]["id"]}).fetchall()
+                    self.preis = ""
+                    for j in range(len(rows_prices)):
+                        self.preis += rows_prices[j]["preistitel"]
+                        if (j >= 0) and (j < (len(rows_prices) - 1)):
+                            self.preis += ", "
+                        if site == "chart":
+                            if rows_prices[j]["preistitel"] == "Ingeborg-Bachmann-Preis":
+                                self.bachmann = True
+                            else:
+                                self.bachmann = False
+                else:
+                    self.preis = "Fehlanzeige"
+
     results = []
     for i in range(len(rows)):
-        results.append(Preresult(rows, i))
+        results.append(Result(rows, i))
 
     return results
 
 
-def prepare_chartdata(rows_preis, rows_preis_percent):
-
+def prepare_woerterchart(woerter, current_id):
     labels = []
-    values_priceless = []
-    values_price = []
-    labels_percent = []
-    values_percent = []
-    values_bachmann = []
-    for k in range(len(rows_preis)):
-        labels.append(rows_preis[k]["kritikerin"])
-        values_priceless.append(rows_preis[k]["preis_false"])
-        bachmann = rows_preis[k]["bachmann_preis"]
-        if bachmann != 0:
-            values_price.append((rows_preis[k]["preis_true"] - bachmann))
-        else:
-            values_price.append(rows_preis[k]["preis_true"])
-        values_bachmann.append(bachmann)
-        labels_percent.append(rows_preis_percent[k]["kritikerin"])
-        values_percent.append(round(rows_preis_percent[k]["percent"], 2))
+    values = []
+    for key in woerter[current_id].keys():
+        labels.append(key)
+    for value in woerter[current_id].values():
+        values.append(value)
 
-    return labels, values_priceless, values_price, labels_percent, values_percent, values_bachmann
+    high = values[0]
+    i = 0
+    for i in range(10):
+        if high % 10 == 0:
+            max = high
+            break
+        else:
+            high += 1
+            i += 1
+
+    return labels, values, max
+
+
+def prepare_barchart(col, rows_preis, rows_preis_percent):
+
+    class Chartdata:
+        def __init__(self, col, rows_preis, rows_preis_percent):
+            self.labels = []
+            self.values_priceless = []
+            self.values_price = []
+            self.labels_percent = []
+            self.values_percent = []
+            self.values_bachmann = []
+
+            if (col == "land") or (col == "ort"):
+                temp_percent = []
+
+            for k in range(len(rows_preis)):
+                self.labels.append(rows_preis[k][col])
+                self.values_priceless.append(rows_preis[k]["preis_false"])
+                bachmann = rows_preis[k]["bachmann_preis"]
+                if bachmann != 0:
+                    self.values_price.append((rows_preis[k]["preis_true"] - bachmann))
+                else:
+                    self.values_price.append(rows_preis[k]["preis_true"])
+                self.values_bachmann.append(bachmann)
+                if col == "kritikerin":
+                    self.labels_percent.append(rows_preis_percent[k][col])
+                    self.values_percent.append(round(rows_preis_percent[k]["percent"], 2))
+                if (col == "land") or (col == "ort"):
+                    if col == "land":
+                        relevance_border = 3
+                    if col == "ort":
+                        relevance_border = 1
+                    if rows_preis_percent[k]["total"] > relevance_border:
+                        self.labels_percent.append(rows_preis_percent[k][col])
+                        self.values_percent.append(round(rows_preis_percent[k]["percent"], 2))
+                    else:
+                        temp_percent.append(round(rows_preis_percent[k]["percent"], 2))
+
+            if (col == "land") or (col == "ort"):
+                if col == "land":
+                    other_label = "Länder"
+                if col == "ort":
+                    other_label = "Orte"
+                temp_avg = 0
+                for percent in temp_percent:
+                    temp_avg += percent
+                    average_percent_other = temp_avg / len(temp_percent)
+                self.labels_percent.append("andere {}".format(other_label))
+                self.values_percent.append(round(average_percent_other, 2))
+
+    chartdata = Chartdata(col, rows_preis, rows_preis_percent)
+    return chartdata
 
 
 def apology(message, code=400):
