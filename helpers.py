@@ -79,7 +79,7 @@ def prepare_age(birthday, year):
     return age
 
 
-def prepare_results(rows, site):
+def prepare_results(rows, site, special):
 
     class Result:
         def __init__(self, rows, i):
@@ -93,7 +93,10 @@ def prepare_results(rows, site):
                 self.land = rows[i]["land"]
                 self.wohnort = rows[i]["wohnort"]
                 self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
+                self.vorgetragen_am = rows[i]["vorgetragen_am"]
                 self.link = rows[i]["webseite"]
+                if special == "alter":
+                    self.alter = prepare_age(rows[i]["geburtsjahr"], rows[i]["teilnahmejahr"])
                 if rows[i]["preis_gewonnen"] == "True":
                     rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
                                              {"name": rows[i]["id"]}).fetchall()
@@ -107,6 +110,11 @@ def prepare_results(rows, site):
                                 self.bachmann = True
                             else:
                                 self.bachmann = False
+                            if special == "alter":
+                                if rows_prices[j]["preistitel"] == "BKS Bank-Publikumspreis":
+                                    self.publikum = True
+                                else:
+                                    self.publikum = False
                 else:
                     self.preis = "Fehlanzeige"
 
@@ -149,33 +157,64 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
             self.values_percent = []
             self.values_bachmann = []
 
-            if (col == "land") or (col == "ort"):
+            relevance_border_bar = 0
+            if col == "ort":
+                relevance_border_bar = 1
+
+            relevance_border_percent = 0
+            if col == "land":
+                relevance_border_percent = 3
+            if col == "ort":
+                relevance_border_percent = 1
+
+            if relevance_border_bar != 0:
+                temp_values_priceless = 0
+                temp_values_price = 0
+                temp_values_bachmann = 0
+
+            if relevance_border_percent != 0:
                 temp_percent = []
 
             for k in range(len(rows_preis)):
-                self.labels.append(rows_preis[k][col])
-                self.values_priceless.append(rows_preis[k]["preis_false"])
-                bachmann = rows_preis[k]["bachmann_preis"]
-                if bachmann != 0:
-                    self.values_price.append((rows_preis[k]["preis_true"] - bachmann))
+                if rows_preis[k]["total"] > relevance_border_bar:
+                    self.labels.append(rows_preis[k][col])
+                    self.values_priceless.append(rows_preis[k]["preis_false"])
+                    bachmann = rows_preis[k]["bachmann_preis"]
+                    if bachmann != 0:
+                        self.values_price.append((rows_preis[k]["preis_true"] - bachmann))
+                    else:
+                        self.values_price.append(rows_preis[k]["preis_true"])
+                    self.values_bachmann.append(bachmann)
                 else:
-                    self.values_price.append(rows_preis[k]["preis_true"])
-                self.values_bachmann.append(bachmann)
-                if col == "kritikerin":
-                    self.labels_percent.append(rows_preis_percent[k][col])
-                    self.values_percent.append(round(rows_preis_percent[k]["percent"], 2))
-                if (col == "land") or (col == "ort"):
-                    if col == "land":
-                        relevance_border = 3
-                    if col == "ort":
-                        relevance_border = 1
-                    if rows_preis_percent[k]["total"] > relevance_border:
+                    temp_values_priceless += rows_preis[k]["preis_false"]
+                    bachmann = rows_preis[k]["bachmann_preis"]
+                    if bachmann != 0:
+                        temp_values_price += (rows_preis[k]["preis_true"] - bachmann)
+                    else:
+                        temp_values_price += rows_preis[k]["preis_true"]
+                    temp_values_bachmann += bachmann
+
+                if relevance_border_percent != 0:
+                    if rows_preis_percent[k]["total"] > relevance_border_percent:
                         self.labels_percent.append(rows_preis_percent[k][col])
                         self.values_percent.append(round(rows_preis_percent[k]["percent"], 2))
                     else:
                         temp_percent.append(round(rows_preis_percent[k]["percent"], 2))
+                else:
+                    self.labels_percent.append(rows_preis_percent[k][col])
+                    self.values_percent.append(round(rows_preis_percent[k]["percent"], 2))
 
-            if (col == "land") or (col == "ort"):
+            if relevance_border_bar != 0:
+                if col == "ort":
+                    other_label = "Orte"
+                if col == "land":
+                    other_label = "Länder"
+                self.labels.append("andere {}".format(other_label))
+                self.values_price.append(temp_values_price)
+                self.values_priceless.append(temp_values_priceless)
+                self.values_bachmann.append(temp_values_bachmann)
+
+            if relevance_border_percent != 0:
                 if col == "land":
                     other_label = "Länder"
                 if col == "ort":

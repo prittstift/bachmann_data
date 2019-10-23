@@ -69,9 +69,9 @@ def search(search_term, criterion):
 
     rows = get_search_data(search_term, criterion)
 
-    results = prepare_results(rows, "search")
+    results = prepare_results(rows, "search", None)
 
-    return render_template("search.html", results=results, criterion=criterion, search_term=search_term)
+    return render_template("search_cards.html", results=results, criterion=criterion, search_term=search_term)
 
 
 @app.route("/text/<int:search_result>",  methods=["GET"])
@@ -80,7 +80,7 @@ def text(search_result):
     rows = db.execute("SELECT * FROM autorinnen WHERE autorinnen.id = :text_id",
                       {"text_id": search_result}).fetchall()
 
-    results = prepare_results(rows, "text")
+    results = prepare_results(rows, "text", None)
 
     labels, values, max = prepare_woerterchart(woerter, search_result)
 
@@ -110,9 +110,9 @@ def text(search_result):
 
         shortlist = ShortList(rows_short)
 
-        return render_template("text2.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit, shortlist=shortlist)
+        return render_template("text_overview.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit, shortlist=shortlist)
     else:
-        return render_template("text2.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit)
+        return render_template("text_overview.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit)
 
 
 @app.route("/woerterchart", methods=["GET"])
@@ -125,55 +125,47 @@ def woerterchart():
     return render_template("woerter.html", labels=labels, values=values, max=max)
 
 
-@app.route("/kritikerinnen", methods=["GET"])
-def kritikerinnen():
-    """Show chart of critics"""
+@app.route("/charts/<string:criterion>", methods=["GET"])
+def kritikerinnen(criterion):
+    """Show charts by criterion"""
 
     rows = db.execute("SELECT * FROM autorinnen").fetchall()
 
-    results = prepare_results(rows, "chart")
+    results = prepare_results(rows, "chart", None)
 
-    rows_preis = db.execute("SELECT * FROM kritikerpreis ORDER BY total DESC").fetchall()
+    percent_chart_height = 60
+    if criterion == "kritikerinnen":
+        table = "kritikerpreis"
+        col = "kritikerin"
+        max_bar = 14
+    elif criterion == "laender":
+        table = "landpreis"
+        col = "land"
+        max_bar = 50
+        percent_chart_height = 20
+    elif criterion == "orte":
+        table = "ortpreis"
+        col = "ort"
+        max_bar = 30
+    elif criterion == "wochentage":
+        table = "vortragspreis"
+        col = "vorgetragen_am"
+        max_bar = 40
+        percent_chart_height = 20
+    elif criterion == "gender":
+        table = "geschlechtpreis"
+        col = "geschlecht"
+        max_bar = 50
+        percent_chart_height = 20
 
-    rows_preis_percent = db.execute("SELECT * FROM kritikerpreis ORDER BY percent DESC").fetchall()
+    rows_preis = db.execute("SELECT * FROM {} ORDER BY total DESC".format(table)).fetchall()
 
-    chartdata = prepare_barchart("kritikerin", rows_preis, rows_preis_percent)
+    rows_preis_percent = db.execute(
+        "SELECT * FROM {} ORDER BY percent DESC".format(table)).fetchall()
 
-    return render_template("kritikerinnen.html", results=results, chartdata=chartdata)
+    chartdata = prepare_barchart(col, rows_preis, rows_preis_percent)
 
-
-@app.route("/laender", methods=["GET"])
-def laender():
-    """Show chart of countries"""
-
-    rows = db.execute("SELECT * FROM autorinnen").fetchall()
-
-    results = prepare_results(rows, "chart")
-
-    rows_preis = db.execute("SELECT * FROM landpreis ORDER BY total DESC").fetchall()
-
-    rows_preis_percent = db.execute("SELECT * FROM landpreis ORDER BY percent DESC").fetchall()
-
-    chartdata = prepare_barchart("land", rows_preis, rows_preis_percent)
-
-    return render_template("laender.html", results=results, chartdata=chartdata)
-
-
-@app.route("/orte", methods=["GET"])
-def orte():
-    """Show chart of cities"""
-
-    rows = db.execute("SELECT * FROM autorinnen").fetchall()
-
-    results = prepare_results(rows, "chart")
-
-    rows_preis = db.execute("SELECT * FROM ortpreis ORDER BY total DESC").fetchall()
-
-    rows_preis_percent = db.execute("SELECT * FROM ortpreis ORDER BY percent DESC").fetchall()
-
-    chartdata = prepare_barchart("ort", rows_preis, rows_preis_percent)
-
-    return render_template("orte.html", results=results, chartdata=chartdata)
+    return render_template("barcharts.html", criterion=criterion.title(), max_bar=max_bar, percent_chart_height=percent_chart_height, results=results, chartdata=chartdata)
 
 
 @app.route("/alter", methods=["GET"])
@@ -182,7 +174,7 @@ def alter():
 
     rows = db.execute("SELECT * FROM autorinnen").fetchall()
 
-    results = prepare_results(rows, "chart")
+    results = prepare_results(rows, "chart", "alter")
 
     kein_Preis = []
     bachmannpreis = []
@@ -224,12 +216,6 @@ def alter():
     publikum_avg = round((publikum_avg / len(publikum)), 2)
 
     return render_template("alter.html", results=results, kein_Preis=kein_Preis, bachmannpreis=bachmannpreis, andere_Preise=andere_Preise, preise=preise, alter=alter, publikum=publikum, publikum_avg=publikum_avg)
-
-
-@app.route("/pie", methods=["GET", "POST"])
-def pie():
-    if request.method == "GET":
-        return render_template("pie.html")
 
 
 @app.route("/login", methods=["GET", "POST"])

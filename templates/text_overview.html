@@ -13,7 +13,7 @@
   <div class="col">
     <p class="text-center text-secondary">
       {% if  search_result != "1" %}<a href="/text/{{ search_result  - 1}}" class="card-link">Vorherige</a> {% endif %} {% if  search_result != "83" %}<a href="/text/{{ search_result + 1 }}" class="card-link">Nächste</a> {% endif %}</p>
-    <h4 class="display-4 text-center"><strong>{{ result.autorinnenname }}</strong><br><em>{{ result.titel }}</em> ({{ result.teilnahmejahr }})</h4>
+    <h1 class="display-5 text-center"><strong>{{ result.autorinnenname }}</strong><br><em>{{ result.titel }}</em> ({{ result.teilnahmejahr }})</h1>
     <br>
     <br>
   </div>
@@ -21,29 +21,32 @@
 <div class="row">
   <div class="col-sm-6">
     <dl class="row">
-      <dt class="col-sm-6 text-left"><a href="/laender" class="card-link">Land</a></dt>
+      <dt class="col-sm-6 text-left"><a href="/charts/laender" class="card-link">Land</a></dt>
       <dd class="col-sm-6 text-left">{{ result.land }}</dd>
 
-      <dt class="col-sm-6 text-left"><a href="/orte" class="card-link">Wohnort</a></dt>
+      <dt class="col-sm-6 text-left"><a href="/charts/orte" class="card-link">Wohnort</a></dt>
       <dd class="col-sm-6 text-left">{{ result.wohnort }}</dd>
 
       <dt class="col-sm-6 text-left"><a href="/alter" class="card-link">Geburtsjahr</a></dt>
       <dd class="col-sm-6 text-left">{{ result.geburtsjahr }}</dd>
 
-      <dt class="col-sm-6 text-left"><a href="/kritikerinnen" class="card-link">Eingeladen von</a></dt>
+      <dt class="col-sm-6 text-left"><a href="/charts/kritikerinnen" class="card-link">Eingeladen von</a></dt>
       <dd class="col-sm-6 text-left">{{ result.eingeladen_von }}</dd>
+
+      <dt class="col-sm-6 text-left"><a href="/charts/wochentage" class="card-link">Vorgetragen am</a></dt>
+      <dd class="col-sm-6 text-left">{{ result.vorgetragen_am }}</dd>
 
       <dt class="col-sm-6 text-left">Preise gewonnen?</dt>
       <dd class="col-sm-6 text-left">{{ result.preis }}</dd>
 
       <dt class="col-sm-6 text-left">Link</dt>
-      <dd class="col-sm-6 text-left"><a class="btn btn-primary col-auto text-left" href="{{ result.link }}"  target="_blank" role="button">Webseite</a></dd>
+      <dd class="col-sm-6 text-left"><a class="btn btn-primary" href="{{ result.link }}"  target="_blank" role="button">Webseite</a></dd>
     </dl>
   </div>
+  {% if shortlist %}
   <div class="col-sm-6">
     <div class="row">
       <div class="col">
-        {% if shortlist %}
         <h6 class="display-6 text-center">für Shortlist gewählt?</h6>
       </div>
     </div>
@@ -55,8 +58,8 @@
       </div>
     </div>
   </div>
+  {% endif %}
 </div>
-{% endif %}
 <br>
 <br>
 <div class="row">
@@ -107,7 +110,8 @@
                 scales: {
                     xAxes: [{
                         ticks: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            max: {{ max }}
                         }
                     }]
                 }
