@@ -1,5 +1,3 @@
-import requests
-import urllib.parse
 import datetime
 from datetime import date
 from flask import redirect, render_template, request, session
@@ -18,13 +16,16 @@ if not os.getenv("DATABASE_URL"):
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
+# Logic for form on index.html
+
 
 def get_search_data(search_term, criterion):
 
     if criterion == "year":
+        # Day and month of competition to match data in database
         days = {2019: "3006", 2018: "0807", 2017: "0907",
                 2016: "0307", 2015: "0507", 2014: "0607", 2013: "0707", 2012: "0807", 2011: "1007", 2010: "2706"}
-
+        # Query database for year of competition
         rows = db.execute("SELECT * FROM autorinnen WHERE teilnahmejahr = :year", {
                           "year": (days[int(search_term)] + str(search_term))}).fetchall()
         return rows
@@ -46,6 +47,7 @@ def get_search_data(search_term, criterion):
                               {"id": t}).fetchall()
             return rows
     elif criterion == "price":
+        # Query database
         rows = db.execute("SELECT autorinnen.id, autorinnen.autorinnenname, autorinnen.titel, autorinnen.eingeladen_von, autorinnen.teilnahmejahr FROM autorinnen JOIN preise ON autorinnen.id = preise.autorinnen_id AND preistitel = :price", {
                           "price": search_term}).fetchall()
         return rows
@@ -56,17 +58,20 @@ def get_search_data(search_term, criterion):
             sql_comparison = "autorinnenname ILIKE CONCAT ('%', :author, '%')"
         elif criterion == "invited_by":
             sql_comparison = "eingeladen_von = :invited_by"
-
+        # Query database
         rows = db.execute("SELECT * FROM autorinnen WHERE {}".format(sql_comparison), {
                           "{}".format(criterion): search_term}).fetchall()
-
         return rows
+
+# Return year from datetime string
 
 
 def prepare_year(data):
 
     year = datetime.datetime.strptime(data, '%d%m%Y').date().year
     return year
+
+# Return age from datetime strings
 
 
 def prepare_age(birthday, year):
@@ -77,6 +82,8 @@ def prepare_age(birthday, year):
     age = float(age_temp.days) / 365.25
     age = round(age, 2)
     return age
+
+# Safe results from query in object
 
 
 def prepare_results(rows, site, special):
@@ -124,6 +131,8 @@ def prepare_results(rows, site, special):
 
     return results
 
+# Logic for chart with most common words
+
 
 def prepare_woerterchart(woerter, current_id):
     labels = []
@@ -132,7 +141,7 @@ def prepare_woerterchart(woerter, current_id):
         labels.append(key)
     for value in woerter[current_id].values():
         values.append(value)
-
+    # Define max value of chart
     high = values[0]
     i = 0
     for i in range(10):
@@ -144,6 +153,8 @@ def prepare_woerterchart(woerter, current_id):
             i += 1
 
     return labels, values, max
+
+# Prepare data for barcharts
 
 
 def prepare_barchart(col, rows_preis, rows_preis_percent):
@@ -157,6 +168,7 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
             self.values_percent = []
             self.values_bachmann = []
 
+            # Define which labels are shown individually by setting min number of value
             relevance_border_bar = 0
             if col == "ort":
                 relevance_border_bar = 1
@@ -175,6 +187,7 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
             if relevance_border_percent != 0:
                 temp_percent = []
 
+            # Safe labels and values for stacked bar chart
             for k in range(len(rows_preis)):
                 if rows_preis[k]["total"] > relevance_border_bar:
                     self.labels.append(rows_preis[k][col])
@@ -193,7 +206,7 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
                     else:
                         temp_values_price += rows_preis[k]["preis_true"]
                     temp_values_bachmann += bachmann
-
+                # Safe labels and values for horizontal bar chart
                 if relevance_border_percent != 0:
                     if rows_preis_percent[k]["total"] > relevance_border_percent:
                         self.labels_percent.append(rows_preis_percent[k][col])
@@ -229,6 +242,8 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
     chartdata = Chartdata(col, rows_preis, rows_preis_percent)
     return chartdata
 
+# render apology page
+
 
 def apology(message, code=400):
     """Render message as an apology to user."""
@@ -243,6 +258,8 @@ def apology(message, code=400):
             s = s.replace(old, new)
         return s
     return render_template("apology.html", top=code, bottom=escape(message)), code
+
+# Logic for internal sites
 
 
 def login_required(f):

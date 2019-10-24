@@ -1,3 +1,4 @@
+# Autorinnen 2014-2019 by last name and 20 most common words (appearences in parentheses)
 albig = "gregor (24); stand (20); kapelle (16); madeleine (15); spürte (12); tür (12); fühlte (10); sah (9); luft (8); madeleines (8); steppe (7); wand (7); wärme (7); beton (6); ging (6); licht (6); schien (6); hing (5); hörte (5); judith (5)"
 baar = "nada (17); nadas (8); wort (7); kopf (6); zeit (6); brust (5); hände (5); recht (5); wusste (5); augen (4); ausgerechnet (4); blick (4); denken (4); finger (4); hielt (4); lange (4); leben (4); lippen (4); strand (4); tag (4)"
 beyer = "reichhart (21); augen (17); kinder (14); scholl (10); vater (10); bruder (9); sah (8); scharfrichter (8); hand (6); hans (6); krieg (6); münchen (6); nickte (6); august (5); christoph (5); gesicht (5); konrad (5); probst (5); stadelheim (5); amt (4)"
@@ -140,18 +141,16 @@ schmidt = "karl (80); mädchen (25); sah (13); schnee (12); hotel (11); fahrzeug
 fries = "vater (18); denke (14); anastasia (13); reich (13); bruder (11); leben (9); mutter (9); schwester (9); zeit (8); schauspieler (7); stelle (7); tv (7); wilhelm (7); eltern (6); höre (6); nietzsche (6); buch (5); gut (5); luft (5); menschen (5)"
 rossbacher = "engel (19); gesicht (16); himmel (15); kopf (15); große (12); zeit (12); rot (10); schaute (10); bild (9); denken (9); kind (9); sonne (9); verschüttet (9); brunnen (8); dachte (8); faden (8); gabriel (8); herbst (8); komm (8); maria (8)"
 
-alles = "mutter (360); augen (350); hand (337); kopf (283); vater (256); zeit (248); leben (245); gut (229); sah (228); gesicht (208); lange (206); stand (204); menschen (200); körper (187); tag (184); tür (182); ging (179); kind (178); haus (154); blick (152)"
+alles = "mutter (602); hand (589); augen (585); kopf (553); vater (496); zeit (458); sah (415); gut (407); leben (399); gesicht (386); tag (362); lange (352); stand (345); ging (343); menschen (312); körper (300); blick (298); tür (298); stehen (289); haus (282)"
 
-# weitere Wörter:  wasser (151); kleine (148); paar (148); weit (148); gerade (143); hände (142); boden (139); kurz (139); luft (139); welt (139); kinder (137); mund (137); stehen (137); haut (129); jahre (129); lässt (129); fenster (127); moment (126); himmel (122); bett (120); licht (120); mensch (119); dachte (118); genau (115); endlich (114); 1 (111); mädchen (111); wohnung (111); stadt (110); jahren (108)
-
+# dict of authors by last name (key) with corresponding id as value
 autor_id_wrong = {albig: 38, baar: 68, beyer: 14, birkhan: 11, birnbacher: 8, bjerg: 23, clavadetscher: 16, dinic: 45, dorian: 53, dündar: 27, dürr:  36, edelbauer: 15, falkner: 63, federer: 6, fischer: 12, flor: 75, fritsch: 61, ganzoni: 80, gardi: 51, gericke: 81, gerster: 5, goetsch: 33, gomringer: 58, grigorcea: 70, groetzner: 26, groß: 19, halter: 67, heier: 76, heitzler: 9, jost: 4, klein: 21, klemm: 74, krohn: 64, kummer: 10, lange: 59, lehn: 50, lohse: 17, loß: 28, macht: 44, maljartschuk: 22, mannhart: 42, marchel: 71,
                   markovic: 35, meschik: 13, fehr: 79, molinari: 40, neft: 24, nickel: 39, nolte: 25, obexer: 41, othmann: 7, otoo: 54, özdogan: 47, peschka: 29, petz: 83, poelzl: 77, poladjan: 57, präauer: 69, preiwuß: 72, recker: 60, rönne: 66, rubinowitz: 82,  sargnagel: 43, schenk: 52, schmalz: 34, schneider_b: 46, schneider_n: 32, schultens: 1, schwitter: 65, sievers: 20, snela: 49, sommer: 73, sozio: 55, stern: 18, thomae: 37, treber: 30, truschner: 62, tschui: 3, varatharajah: 78, wipauer: 2, wolf: 48, wray: 31, zwicky: 56, boehning: 84, meyerhoff: 85, kegele: 86, guentner: 87, mueller: 88, rock: 89, simon: 90, helle: 91, schoenthaler: 92, petrowskaja: 93, duebgen: 94, ehrlich: 95, maack: 96, mehlhorn: 97, moster: 98, ramnek: 99, richner: 100, stichmann: 101, hassinger: 102, mahlke: 103, travnicek: 104, martynova: 105, kraenzler: 106, froehling: 107, nawrat: 108, senkel: 109, federmair: 110, feimer: 111, geltinger: 112, steinbeis: 113, wisser: 114, prassler: 115, baum: 116, reichlin: 117, haderlap: 118, rabinowich: 119, bussmann: 120, popp: 121, randt: 122, richter: 123, bozikovic: 124, klupp: 125, janesch: 126, altwasser: 127, kloeble: 128, mezger: 129, elmiger: 130, ballhausen: 131, scharnigg: 132, scholz: 133, zander: 134, kleindienst: 135, wawerzinek: 136, schmidt: 137, fries: 138, rossbacher: 139, alles: 0}
-autoren = [albig, baar, beyer, birkhan, birnbacher, bjerg, clavadetscher, dinic, dorian, dündar, dürr, edelbauer, falkner, federer, fischer, flor, fritsch, ganzoni, gardi, gericke, gerster, goetsch, gomringer, grigorcea, groetzner, groß, halter, heier, heitzler, jost, klein, klemm, krohn, kummer, lange, lehn, lohse, loß, macht, maljartschuk, mannhart, marchel,
-           markovic, meschik, fehr, molinari, neft, nickel, nolte, obexer, othmann, otoo, özdogan, peschka, petz, poelzl, poladjan, präauer, preiwuß, recker, rönne, rubinowitz,  sargnagel, schenk, schmalz, schneider_b, schneider_n, schultens, schwitter, sievers, snela, sommer, sozio, stern, thomae, treber, truschner, tschui, varatharajah, wipauer, wolf, wray, zwicky, alles]
 
+# reverse key and value
 woerter = {y: x for x, y in autor_id_wrong.items()}
 
-i = 1
+# create list of lists out of strings
 for i in range(0, len(woerter)):
     autor_split = woerter[i].split("; ")
     autor_split2 = []
@@ -162,18 +161,10 @@ for i in range(0, len(woerter)):
         list[1] = int(list[1])
         autor_split2.append(list)
 
+    # create new dictionary woerter with seperated words and number of appearences for chart on "text_overview"
     autor_dict = {}
     for item in autor_split2:
         j = iter(item)
         autor_dict.update(zip(j, j))
     woerter[i] = autor_dict
     i += 1
-
-# labels = []
-# values = []
-
-# for key in woerter[1].keys():
-    # labels.append(key)
-
-# for value in woerter[1].values():
-    # values.append(value)

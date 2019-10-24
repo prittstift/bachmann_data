@@ -6,7 +6,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import apology, login_required, get_search_data, prepare_results, prepare_barchart, prepare_age, prepare_year, prepare_woerterchart
 from woerter import woerter
 import os
-import collections
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -39,9 +38,8 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-
+# index page
 @app.route("/",  methods=["GET", "POST"])
-# @login_required
 def index():
     if request.method == "POST":
 
@@ -62,39 +60,43 @@ def index():
     else:
         return render_template("index.html")
 
-
+# search page
 @app.route("/search/q=<string:search_term>&criterion=<string:criterion>",  methods=["GET"])
-# @login_required
 def search(search_term, criterion):
-
+    # Query database
     rows = get_search_data(search_term, criterion)
-
+    # Prepare results in results object
     results = prepare_results(rows, "search", None)
 
     return render_template("search_cards.html", results=results, criterion=criterion, search_term=search_term)
 
-
+# text overview page
 @app.route("/text/<int:search_result>",  methods=["GET"])
-# @login_required
 def text(search_result):
+    # Query database
     rows = db.execute("SELECT * FROM autorinnen WHERE autorinnen.id = :text_id",
                       {"text_id": search_result}).fetchall()
-
+    # Prepare results in results object
     results = prepare_results(rows, "text", None)
-
+    # Prepare data for chart
     labels, values, max = prepare_woerterchart(woerter, search_result)
 
     autorin_id = rows[0]["id"]
-
+    # Query database for quotation
     rows_fazit = db.execute("SELECT fazit FROM juryfazit WHERE autorin_id = :id",
                             {"id": int(autorin_id)}).fetchall()
     fazit = rows_fazit[0]["fazit"]
 
+    # Define column width for grid system, if no doughnut chart on the right
     infotable_col_width = 12
+
+    # if year == 2019, add doughnut chart with final voting results
     if autorin_id in range(1, 15):
         infotable_col_width = 6
+        # Query database for voting results by jury member
         rows_short = db.execute("SELECT kritikerin, shortlist_kritiker, eingeladen FROM shortlist WHERE autorin_id = :id",
                                 {"id": int(autorin_id)}).fetchall()
+        # Create results object
 
         class ShortList:
             def __init__(self, rows_short):
@@ -116,31 +118,33 @@ def text(search_result):
     else:
         return render_template("text_overview.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit, infotable_col_width=infotable_col_width)
 
-
+# page with chart on most common words in all texts
 @app.route("/woerterchart", methods=["GET"])
 def woerterchart():
     """Show chart of words"""
 
     alles_id = 0
+    # Get data for chart
     labels, values, max = prepare_woerterchart(woerter, alles_id)
 
     return render_template("woerter.html", labels=labels, values=values, max=max)
 
-
+# logic for pages with charts about depency between won prices and various criteria
 @app.route("/charts/<string:criterion>", methods=["GET"])
 def kritikerinnen(criterion):
     """Show charts by criterion"""
-
+    # Query database (table with individual infos on authors not yet implemented)
     rows = db.execute("SELECT * FROM autorinnen").fetchall()
-
+    # Safe results in results object
     results = prepare_results(rows, "chart", None)
-
+    # Adjust charts for different criteria
     percent_chart_height = 60
     if criterion == "kritikerinnen":
         table = "kritikerpreis"
         col = "kritikerin"
         max_bar = 20
     elif criterion == "laender":
+        criterion = "länder"
         table = "landpreis"
         col = "land"
         max_bar = 90
@@ -159,25 +163,25 @@ def kritikerinnen(criterion):
         col = "geschlecht"
         max_bar = 80
         percent_chart_height = 20
-
+    # Query chart table
     rows_preis = db.execute("SELECT * FROM {} ORDER BY total DESC".format(table)).fetchall()
-
+    # Query chart table
     rows_preis_percent = db.execute(
         "SELECT * FROM {} ORDER BY percent DESC".format(table)).fetchall()
-
+    # Safe results in object with all chart data
     chartdata = prepare_barchart(col, rows_preis, rows_preis_percent)
 
     return render_template("barcharts.html", criterion=criterion.title(), max_bar=max_bar, percent_chart_height=percent_chart_height, results=results, chartdata=chartdata)
 
-
+# page with chart on age
 @app.route("/alter", methods=["GET"])
 def alter():
     """Show chart of ages"""
-
+    # Query database
     rows = db.execute("SELECT * FROM autorinnen").fetchall()
-
+    # Safe results in object
     results = prepare_results(rows, "chart", "alter")
-
+    # Prepare data for scatterplot and line chart
     kein_Preis = []
     bachmannpreis = []
     andere_Preise = []
@@ -219,7 +223,7 @@ def alter():
 
     return render_template("alter.html", results=results, kein_Preis=kein_Preis, bachmannpreis=bachmannpreis, andere_Preise=andere_Preise, preise=preise, alter=alter, publikum=publikum, publikum_avg=publikum_avg)
 
-
+# logic for login page (if implemented in the future)
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
@@ -256,7 +260,7 @@ def login():
     else:
         return render_template("login.html")
 
-
+# logic for logout (if implemented)
 @app.route("/logout")
 def logout():
     """Log user out"""
@@ -267,7 +271,7 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
-
+# logic for registration (if implemented)
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
@@ -314,6 +318,8 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
+
+# Prevent site crashing
 
 
 def errorhandler(e):
