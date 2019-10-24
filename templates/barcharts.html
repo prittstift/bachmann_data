@@ -8,127 +8,124 @@
     <div class="header">
         <h2 class="text-center">Bachmannpreis (2010-2019)</h2>
     </div>
-    <div class="container-fluid">
-      <div class="container-canvas" style="position: relative; margin: auto; height:60vh; width:80vw">
-        <canvas id="stackedChart"></canvas>
-      </div>
-      <div class="container-canvas" style="position: relative; margin: auto; height:{{ percent_chart_height }}vh; width:80vw">
-        <canvas id="horizontalBar"></canvas>
-      </div>
+    <div class="container-canvas" style="position: relative; margin: auto; height:60vh; width:80vw">
+      <canvas id="stackedChart"></canvas>
     </div>
+    <div class="container-canvas" style="position: relative; margin: auto; height:{{ percent_chart_height }}vh; width:80vw">
+      <canvas id="horizontalBar"></canvas>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script>
 
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-            <script>
+          var ctx = document.getElementById('stackedChart').getContext('2d');
 
-                  var ctx = document.getElementById('stackedChart').getContext('2d');
-
-                  var kritikerChart = new Chart(ctx, {
-                      type: 'bar',
-                      data: {
-                          labels:  [
-                                 {% for item in chartdata.labels %}
-                                  "{{ item }}",
-                                 {% endfor %}],
-                          datasets: [{
-                              label: "Bachmann-Preis gewonnen",
-                              data: [
-                                {% for item in chartdata.values_bachmann %}
-                                 "{{ item }}",
-                                {% endfor %}],
-                              backgroundColor: 'rgba(231, 53, 234, 0.2)',
-                              borderColor: 'rgba(231, 53, 234, 1)',
-                              borderWidth: 1
-                          },
-                          {
-                              label: "andere Preise gewonnen",
-                              data: [
-                                {% for item in chartdata.values_price %}
-                                 "{{ item }}",
-                                {% endfor %}],
-                              backgroundColor: 'rgba(53, 90, 234, 0.2)',
-                              borderColor: 'rgba(53, 90, 234, 1)',
-                              borderWidth: 1
-                          },
-                          {
-                            label: "keinen Preis gewonnen",
-                            data: [
-                              {% for item in chartdata.values_priceless %}
-                               "{{ item }}",
-                              {% endfor %}],
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                          }]
-                      },
-                      options: {
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          title: {
-                            display: true,
-                            text: "{{ criterion }} und gewonnene Preise"
-                          },
-                          tooltips: {
-                            mode: "index",
-                            intersect: false
-                          },
-                          legend: {
-                            display: false,
-                            },
-                          scales: {
-                            xAxes: [{
-                                  stacked: true,
-                                  barPercentage: 0.5
-                                  }],
-                              yAxes: [{
-                                  stacked: true,
-                                  ticks: {
-                                      beginAtZero: true,
-                                      max: {{ max_bar }}
-                                  }
-                              }]
+          var kritikerChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                  labels:  [
+                         {% for item in chartdata.labels %}
+                          "{{ item }}",
+                         {% endfor %}],
+                  datasets: [{
+                      label: "Bachmann-Preis gewonnen",
+                      data: [
+                        {% for item in chartdata.values_bachmann %}
+                         "{{ item }}",
+                        {% endfor %}],
+                      backgroundColor: 'rgba(231, 53, 234, 0.2)',
+                      borderColor: 'rgba(231, 53, 234, 1)',
+                      borderWidth: 1
+                  },
+                  {
+                      label: "andere Preise gewonnen",
+                      data: [
+                        {% for item in chartdata.values_price %}
+                         "{{ item }}",
+                        {% endfor %}],
+                      backgroundColor: 'rgba(53, 90, 234, 0.2)',
+                      borderColor: 'rgba(53, 90, 234, 1)',
+                      borderWidth: 1
+                  },
+                  {
+                    label: "keinen Preis gewonnen",
+                    data: [
+                      {% for item in chartdata.values_priceless %}
+                       "{{ item }}",
+                      {% endfor %}],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  title: {
+                    display: true,
+                    text: "{{ criterion }} und gewonnene Preise"
+                  },
+                  tooltips: {
+                    mode: "index",
+                    intersect: false
+                  },
+                  legend: {
+                    display: false,
+                    },
+                  scales: {
+                    xAxes: [{
+                          stacked: true,
+                          barPercentage: 0.5
+                          }],
+                      yAxes: [{
+                          stacked: true,
+                          ticks: {
+                              beginAtZero: true,
+                              max: {{ max_bar }}
                           }
-                      }
-                  });
+                      }]
+                  }
+              }
+          });
 
-                  var ctx = document.getElementById('horizontalBar').getContext('2d');
+          var ctx = document.getElementById('horizontalBar').getContext('2d');
 
-                  var percentChart = new Chart(ctx, {
-                      type: 'horizontalBar',
-                      data: {
-                          labels:  [
-                                 {% for item in chartdata.labels_percent %}
-                                  "{{ item }}",
-                                 {% endfor %}],
-                          datasets: [{
-                              label: "Preis gewonnen",
-                              data: [
-                                {% for item in chartdata.values_percent %}
-                                 "{{ item }}",
-                                {% endfor %}],
-                              backgroundColor: 'rgba(53, 90, 234, 0.2)',
-                              borderColor: 'rgba(53, 90, 234, 1)',
-                              borderWidth: 1
-                          }]
-                      },
-                      options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        title: {
-                          display: true,
-                          text: "{{ criterion }} und Gewinnquote"
-                        },
-                        legend: {
-                            display: false,
-                            },
-                          scales: {
-                              xAxes: [{
-                                  ticks: {
-                                      beginAtZero: true,
-                                      max: 100
-                                  }
-                              }]
+          var percentChart = new Chart(ctx, {
+              type: 'horizontalBar',
+              data: {
+                  labels:  [
+                         {% for item in chartdata.labels_percent %}
+                          "{{ item }}",
+                         {% endfor %}],
+                  datasets: [{
+                      label: "Preis gewonnen",
+                      data: [
+                        {% for item in chartdata.values_percent %}
+                         "{{ item }}",
+                        {% endfor %}],
+                      backgroundColor: 'rgba(53, 90, 234, 0.2)',
+                      borderColor: 'rgba(53, 90, 234, 1)',
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                title: {
+                  display: true,
+                  text: "{{ criterion }} und Gewinnquote"
+                },
+                legend: {
+                    display: false,
+                    },
+                  scales: {
+                      xAxes: [{
+                          ticks: {
+                              beginAtZero: true,
+                              max: 100
                           }
-                      }
-                  });
-            </script>
+                      }]
+                  }
+              }
+          });
+    </script>
 {% endblock %}
