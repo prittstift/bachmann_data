@@ -319,9 +319,8 @@ def register():
     else:
         return render_template("register.html")
 
+
 # Prevent site crashing
-
-
 def errorhandler(e):
     """Handle error"""
     if not isinstance(e, HTTPException):
