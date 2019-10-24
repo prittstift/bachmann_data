@@ -90,7 +90,9 @@ def text(search_result):
                             {"id": int(autorin_id)}).fetchall()
     fazit = rows_fazit[0]["fazit"]
 
+    infotable_col_width = 12
     if autorin_id in range(1, 15):
+        infotable_col_width = 6
         rows_short = db.execute("SELECT kritikerin, shortlist_kritiker, eingeladen FROM shortlist WHERE autorin_id = :id",
                                 {"id": int(autorin_id)}).fetchall()
 
@@ -110,9 +112,9 @@ def text(search_result):
 
         shortlist = ShortList(rows_short)
 
-        return render_template("text_overview.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit, shortlist=shortlist)
+        return render_template("text_overview.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit, shortlist=shortlist, infotable_col_width=infotable_col_width)
     else:
-        return render_template("text_overview.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit)
+        return render_template("text_overview.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit, infotable_col_width=infotable_col_width)
 
 
 @app.route("/woerterchart", methods=["GET"])
@@ -137,25 +139,25 @@ def kritikerinnen(criterion):
     if criterion == "kritikerinnen":
         table = "kritikerpreis"
         col = "kritikerin"
-        max_bar = 14
+        max_bar = 20
     elif criterion == "laender":
         table = "landpreis"
         col = "land"
-        max_bar = 50
+        max_bar = 90
         percent_chart_height = 20
     elif criterion == "orte":
         table = "ortpreis"
         col = "ort"
-        max_bar = 30
+        max_bar = 40
     elif criterion == "wochentage":
         table = "vortragspreis"
         col = "vorgetragen_am"
-        max_bar = 40
+        max_bar = 50
         percent_chart_height = 20
     elif criterion == "gender":
         table = "geschlechtpreis"
         col = "geschlecht"
-        max_bar = 50
+        max_bar = 80
         percent_chart_height = 20
 
     rows_preis = db.execute("SELECT * FROM {} ORDER BY total DESC".format(table)).fetchall()

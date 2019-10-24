@@ -23,7 +23,7 @@ def get_search_data(search_term, criterion):
 
     if criterion == "year":
         days = {2019: "3006", 2018: "0807", 2017: "0907",
-                2016: "0307", 2015: "0507", 2014: "0607"}
+                2016: "0307", 2015: "0507", 2014: "0607", 2013: "0707", 2012: "0807", 2011: "1007", 2010: "2706"}
 
         rows = db.execute("SELECT * FROM autorinnen WHERE teilnahmejahr = :year", {
                           "year": (days[int(search_term)] + str(search_term))}).fetchall()
