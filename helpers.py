@@ -169,9 +169,13 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
             self.values_bachmann = []
 
             # Define which labels are shown individually by setting min number of value
-            relevance_border_bar = 5
+            relevance_border_bar = 0
             if col == "ort":
-                relevance_border_bar = 1
+                relevance_border_bar = 2
+            if col == "land":
+                relevance_border_bar = 5
+            if col == "kritikerin":
+                relevance_border_bar = 5
 
             relevance_border_percent = 0
             if col == "land":

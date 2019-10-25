@@ -152,7 +152,7 @@ def kritikerinnen(criterion):
     elif criterion == "orte":
         table = "ortpreis"
         col = "ort"
-        max_bar = 40
+        max_bar = 50
     elif criterion == "wochentage":
         table = "vortragspreis"
         col = "vorgetragen_am"
