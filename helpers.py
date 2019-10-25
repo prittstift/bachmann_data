@@ -169,7 +169,7 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
             self.values_bachmann = []
 
             # Define which labels are shown individually by setting min number of value
-            relevance_border_bar = 0
+            relevance_border_bar = 5
             if col == "ort":
                 relevance_border_bar = 1
 
@@ -222,6 +222,8 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
                     other_label = "Orte"
                 if col == "land":
                     other_label = "Länder"
+                if col == "kritikerin":
+                    other_label = "Kritikerinnen"
                 self.labels.append("andere {}".format(other_label))
                 self.values_price.append(temp_values_price)
                 self.values_priceless.append(temp_values_priceless)
