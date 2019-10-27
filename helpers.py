@@ -20,21 +20,29 @@ db = scoped_session(sessionmaker(bind=engine))
 
 
 def get_search_data(search_term, criterion):
+    term_list = search_term.split("+")
+    criterion_list = criterion.split("+")
+    sql_explain = {}
+    select = "SELECT autorinnen.id, autorinnen.autorinnenname, autorinnen.titel, autorinnen.eingeladen_von, autorinnen.teilnahmejahr FROM autorinnen JOIN preise_new ON autorinnen.id = preise_new.autorinnen_id AND "
+    crit_counter = 0
 
-    if criterion == "year":
+    if "year" in criterion_list:
         # Day and month of competition to match data in database
         days = {2019: "3006", 2018: "0807", 2017: "0907",
                 2016: "0307", 2015: "0507", 2014: "0607", 2013: "0707", 2012: "0807", 2011: "1007", 2010: "2706"}
         # Query database for year of competition
-        rows = db.execute("SELECT * FROM autorinnen WHERE teilnahmejahr = :year", {
-                          "year": (days[int(search_term)] + str(search_term))}).fetchall()
-        return rows
+        # rows = db.execute("SELECT * FROM autorinnen WHERE teilnahmejahr = :year", {
+        # "year": (days[int(search_term)] + str(search_term))}).fetchall()
+        # return rows
+        select += "autorinnen.teilnahmejahr = :year"
+        sql_explain["year"] = (days[int(term_list[0])] + str(term_list[0]))
+        crit_counter += 1
 
-    elif criterion == "word":
+    if "word" in criterion_list:
         ids = []
         for i in range(1, len(woerter)):
             for key in woerter[i].keys():
-                if key == search_term.lower():
+                if term_list[5].lower() in key:
                     ids.append(i)
         t = tuple(ids)
 
@@ -43,26 +51,57 @@ def get_search_data(search_term, criterion):
             return apology("must provide exact word OR word does not appear in texts", 400)
         else:
             # Query database
-            rows = db.execute("SELECT * FROM autorinnen WHERE id IN :id",
-                              {"id": t}).fetchall()
-            return rows
-    elif criterion == "price":
-        # Query database
-        rows = db.execute("SELECT autorinnen.id, autorinnen.autorinnenname, autorinnen.titel, autorinnen.eingeladen_von, autorinnen.teilnahmejahr FROM autorinnen JOIN preise ON autorinnen.id = preise.autorinnen_id AND preistitel = :price", {
-                          "price": search_term}).fetchall()
-        return rows
-    else:
-        if criterion == "title":
-            sql_comparison = "titel ILIKE CONCAT ('%', :title, '%')"
-        elif criterion == "author":
-            sql_comparison = "autorinnenname ILIKE CONCAT ('%', :author, '%')"
-        elif criterion == "invited_by":
-            sql_comparison = "eingeladen_von = :invited_by"
-        # Query database
-        rows = db.execute("SELECT * FROM autorinnen WHERE {}".format(sql_comparison), {
-                          "{}".format(criterion): search_term}).fetchall()
-        return rows
+            # rows = db.execute("SELECT * FROM autorinnen WHERE id IN :id",
+                              # {"id": t}).fetchall()
+            # return rows
+            if crit_counter == 1:
+                select += " AND "
+                crit_counter = 0
+            select += "autorinnen.id IN :id"
+            sql_explain["id"] = t
+            crit_counter += 1
 
+    if "price" in criterion_list:
+        # Query database
+        # rows = db.execute("SELECT autorinnen.id, autorinnen.autorinnenname, autorinnen.titel, autorinnen.eingeladen_von, autorinnen.teilnahmejahr FROM autorinnen JOIN preise ON autorinnen.id = preise.autorinnen_id AND preistitel = :price", {
+                          # "price": search_term}).fetchall()
+        # return rows
+        if crit_counter == 1:
+            select += " AND "
+            crit_counter = 0
+        select += "preistitel ILIKE CONCAT ('%', :price, '%')"
+        sql_explain["price"] = term_list[4]
+        crit_counter += 1
+    if "title" in criterion_list:
+        if crit_counter == 1:
+            select += " AND "
+            crit_counter = 0
+        select += "autorinnen.titel ILIKE CONCAT ('%', :title, '%')"
+        sql_explain["title"] = term_list[1]
+        crit_counter += 1
+    if "author" in criterion_list:
+        if crit_counter == 1:
+            select += " AND "
+            crit_counter = 0
+        select += "autorinnen.autorinnenname ILIKE CONCAT ('%', :author, '%')"
+        sql_explain["author"] = term_list[2]
+        crit_counter += 1
+    if "invited_by" in criterion_list:
+        if crit_counter == 1:
+            select += " AND "
+            crit_counter = 0
+        select += "autorinnen.eingeladen_von = :invited_by"
+        sql_explain["invited_by"] = term_list[3]
+        crit_counter += 1
+
+        # Query database
+        # rows = db.execute("SELECT * FROM autorinnen WHERE {}".format(sql_comparison), {
+        # "{}".format(criterion): search_term}).fetchall()
+        # return rows
+    print(select)
+    print(sql_explain)
+    rows = db.execute(select, sql_explain).fetchall()
+    return rows
 # Return year from datetime string
 
 

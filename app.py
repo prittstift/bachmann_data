@@ -44,17 +44,36 @@ def index():
     if request.method == "POST":
 
         criteria = ["year", "title", "author", "invited_by", "price", "word"]
-
+        chosen_val = []
+        chosen_crit = []
+        counter = 0
         for criterion in criteria:
             # Search by criterion
             if request.form.get(criterion):
+                temp = request.form.get(criterion)
+                chosen_val.append(temp)
+                chosen_crit.append(criterion)
+            else:
+                chosen_val.append(counter)
+                counter += 1
 
-                search_term = request.form.get(criterion)
-
-                return redirect("/search/q={}&criterion={}".format(str(search_term), str(criterion)))
-        # Incorrect search
-        else:
+        search_term = ""
+        mult_crit = ""
+        for item in chosen_val:
+            if item == chosen_val[-1]:
+                search_term += str(item)
+            else:
+                search_term += str(item) + "+"
+        for item in chosen_crit:
+            if item == chosen_crit[-1]:
+                mult_crit += item
+            else:
+                mult_crit += item + "+"
+        if mult_crit == "":
+            # Incorrect search
             return apology("must provide input for year, title, author or invited_by", 400)
+        else:
+            return redirect("search/q={}&criterion={}".format(str(search_term), str(mult_crit)))
 
     # request method "GET"
     else:
