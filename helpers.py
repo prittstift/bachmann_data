@@ -16,44 +16,51 @@ if not os.getenv("DATABASE_URL"):
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
-# Logic for form on index.html
-
 
 def get_search_data(search_term, criterion):
+    # Logic for form on index.html (mulitple criteria search)
+
+    # Create map to access all criteria and all search_terms for query
     term_list = search_term.split("+")
     criterion_list = criterion.split("+")
+    crit_term_map = {}
+    for i in range(len(criterion_list)):
+        crit_term_map[criterion_list[i]] = term_list[i]
+
+    # Create dictionnary for query
     sql_explain = {}
+
+    # Create beginning of query command
     select = "SELECT autorinnen.id, autorinnen.autorinnenname, autorinnen.titel, autorinnen.eingeladen_von, autorinnen.teilnahmejahr FROM autorinnen JOIN preise_new ON autorinnen.id = preise_new.autorinnen_id AND "
+
+    # Count, if condition for query command was added
     crit_counter = 0
 
     if "year" in criterion_list:
         # Day and month of competition to match data in database
         days = {2019: "3006", 2018: "0807", 2017: "0907",
                 2016: "0307", 2015: "0507", 2014: "0607", 2013: "0707", 2012: "0807", 2011: "1007", 2010: "2706"}
-        # Query database for year of competition
-        # rows = db.execute("SELECT * FROM autorinnen WHERE teilnahmejahr = :year", {
-        # "year": (days[int(search_term)] + str(search_term))}).fetchall()
-        # return rows
+
+        # Add condition to query command
         select += "autorinnen.teilnahmejahr = :year"
-        sql_explain["year"] = (days[int(term_list[0])] + str(term_list[0]))
+        # Add element to query dictionnary
+        sql_explain["year"] = (days[int(crit_term_map["year"])] + str(crit_term_map["year"]))
+        # New condition was added
         crit_counter += 1
 
     if "word" in criterion_list:
+        # Find all id's where search term matches any of 20 most common words in text
         ids = []
         for i in range(1, len(woerter)):
             for key in woerter[i].keys():
-                if term_list[5].lower() in key:
+                if crit_term_map["word"].lower() in key:
                     ids.append(i)
         t = tuple(ids)
 
         if ids == []:
             # Incorrect search
-            return apology("must provide exact word OR word does not appear in texts", 400)
+            return False
         else:
-            # Query database
-            # rows = db.execute("SELECT * FROM autorinnen WHERE id IN :id",
-                              # {"id": t}).fetchall()
-            # return rows
             if crit_counter == 1:
                 select += " AND "
                 crit_counter = 0
@@ -61,60 +68,34 @@ def get_search_data(search_term, criterion):
             sql_explain["id"] = t
             crit_counter += 1
 
-    if "price" in criterion_list:
-        # Query database
-        # rows = db.execute("SELECT autorinnen.id, autorinnen.autorinnenname, autorinnen.titel, autorinnen.eingeladen_von, autorinnen.teilnahmejahr FROM autorinnen JOIN preise ON autorinnen.id = preise.autorinnen_id AND preistitel = :price", {
-                          # "price": search_term}).fetchall()
-        # return rows
-        if crit_counter == 1:
-            select += " AND "
-            crit_counter = 0
-        select += "preistitel ILIKE CONCAT ('%', :price, '%')"
-        sql_explain["price"] = term_list[4]
-        crit_counter += 1
-    if "title" in criterion_list:
-        if crit_counter == 1:
-            select += " AND "
-            crit_counter = 0
-        select += "autorinnen.titel ILIKE CONCAT ('%', :title, '%')"
-        sql_explain["title"] = term_list[1]
-        crit_counter += 1
-    if "author" in criterion_list:
-        if crit_counter == 1:
-            select += " AND "
-            crit_counter = 0
-        select += "autorinnen.autorinnenname ILIKE CONCAT ('%', :author, '%')"
-        sql_explain["author"] = term_list[2]
-        crit_counter += 1
-    if "invited_by" in criterion_list:
-        if crit_counter == 1:
-            select += " AND "
-            crit_counter = 0
-        select += "autorinnen.eingeladen_von = :invited_by"
-        sql_explain["invited_by"] = term_list[3]
-        crit_counter += 1
+    # Preparation for query if criterion is price, title, author or invited_by
+    dict = {"price": "preistitel", "title": "titel",
+            "author": "autorinnenname", "invited_by": "eingeladen_von"}
+    for element in dict:
+        if element in criterion_list:
+            if crit_counter == 1:
+                select += " AND "
+                crit_counter = 0
+            if element == "invited_by":
+                select += "eingeladen_von = :invited_by"
+            else:
+                select += "{} ILIKE CONCAT ('%', :{}, '%')".format(dict[element], element)
+            sql_explain["{}".format(element)] = crit_term_map["{}".format(element)]
+            crit_counter += 1
 
-        # Query database
-        # rows = db.execute("SELECT * FROM autorinnen WHERE {}".format(sql_comparison), {
-        # "{}".format(criterion): search_term}).fetchall()
-        # return rows
-    print(select)
-    print(sql_explain)
+    # Query database
     rows = db.execute(select, sql_explain).fetchall()
     return rows
-# Return year from datetime string
 
 
 def prepare_year(data):
-
+    # Return year from datetime string
     year = datetime.datetime.strptime(data, '%d%m%Y').date().year
     return year
 
-# Return age from datetime strings
-
 
 def prepare_age(birthday, year):
-
+    # Return age from datetime strings
     date_temp = datetime.datetime.strptime(birthday, '%d%m%Y').date()
     year_temp = datetime.datetime.strptime(year, '%d%m%Y').date()
     age_temp = year_temp - date_temp
@@ -122,11 +103,9 @@ def prepare_age(birthday, year):
     age = round(age, 2)
     return age
 
-# Safe results from query in object
-
 
 def prepare_results(rows, site, special):
-
+    # Safe results from query in object
     class Result:
         def __init__(self, rows, i):
             self.autorinnenname = rows[i]["autorinnenname"]
@@ -144,23 +123,19 @@ def prepare_results(rows, site, special):
                 if special == "alter":
                     self.alter = prepare_age(rows[i]["geburtsjahr"], rows[i]["teilnahmejahr"])
                 if rows[i]["preis_gewonnen"] == "True":
-                    rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
+                    rows_prices = db.execute("SELECT preistitel FROM preise_new WHERE autorinnen_id = :name",
                                              {"name": rows[i]["id"]}).fetchall()
-                    self.preis = ""
-                    for j in range(len(rows_prices)):
-                        self.preis += rows_prices[j]["preistitel"]
-                        if (j >= 0) and (j < (len(rows_prices) - 1)):
-                            self.preis += ", "
-                        if site == "chart":
-                            if rows_prices[j]["preistitel"] == "Ingeborg-Bachmann-Preis":
-                                self.bachmann = True
+                    self.preis = rows_prices[0]["preistitel"]
+                    if site == "chart":
+                        if "Ingeborg-Bachmann-Preis" in rows_prices[0]["preistitel"]:
+                            self.bachmann = True
+                        else:
+                            self.bachmann = False
+                        if special == "alter":
+                            if "Publikumspreis" in rows_prices[0]["preistitel"]:
+                                self.publikum = True
                             else:
-                                self.bachmann = False
-                            if special == "alter":
-                                if rows_prices[j]["preistitel"] == "BKS Bank-Publikumspreis":
-                                    self.publikum = True
-                                else:
-                                    self.publikum = False
+                                self.publikum = False
                 else:
                     self.preis = "Fehlanzeige"
 
@@ -170,10 +145,9 @@ def prepare_results(rows, site, special):
 
     return results
 
-# Logic for chart with most common words
-
 
 def prepare_woerterchart(woerter, current_id):
+    # Logic for chart with most common words
     labels = []
     values = []
     for key in woerter[current_id].keys():
@@ -193,11 +167,9 @@ def prepare_woerterchart(woerter, current_id):
 
     return labels, values, max
 
-# Prepare data for barcharts
-
 
 def prepare_barchart(col, rows_preis, rows_preis_percent):
-
+    # Prepare data for barcharts
     class Chartdata:
         def __init__(self, col, rows_preis, rows_preis_percent):
             self.labels = []
@@ -287,10 +259,9 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
     chartdata = Chartdata(col, rows_preis, rows_preis_percent)
     return chartdata
 
-# render apology page
-
 
 def apology(message, code=400):
+    # render apology page
     """Render message as an apology to user."""
     def escape(s):
         """
@@ -304,10 +275,9 @@ def apology(message, code=400):
         return s
     return render_template("apology.html", top=code, bottom=escape(message)), code
 
-# Logic for internal sites
-
 
 def login_required(f):
+    # Logic for internal sites
     """
     Decorate routes to require login.
 

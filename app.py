@@ -44,34 +44,25 @@ def index():
     if request.method == "POST":
 
         criteria = ["year", "title", "author", "invited_by", "price", "word"]
-        chosen_val = []
-        chosen_crit = []
-        counter = 0
+        # String  of inputs that have been searched for
+        search_term = ""
+        # String of criteria that have been searched by
+        mult_crit = ""
+
         for criterion in criteria:
             # Search by criterion
             if request.form.get(criterion):
                 temp = request.form.get(criterion)
-                chosen_val.append(temp)
-                chosen_crit.append(criterion)
-            else:
-                chosen_val.append(counter)
-                counter += 1
+                search_term += str(temp) + "+"
+                mult_crit += criterion + "+"
+        if "+" == search_term[-1]:
+            search_term = search_term[:-1]
+        if "+" == mult_crit[-1]:
+            mult_crit = mult_crit[:-1]
 
-        search_term = ""
-        mult_crit = ""
-        for item in chosen_val:
-            if item == chosen_val[-1]:
-                search_term += str(item)
-            else:
-                search_term += str(item) + "+"
-        for item in chosen_crit:
-            if item == chosen_crit[-1]:
-                mult_crit += item
-            else:
-                mult_crit += item + "+"
         if mult_crit == "":
             # Incorrect search
-            return apology("must provide input for year, title, author or invited_by", 400)
+            return apology("must provide input", 400)
         else:
             return redirect("search/q={}&criterion={}".format(str(search_term), str(mult_crit)))
 
@@ -84,6 +75,9 @@ def index():
 def search(search_term, criterion):
     # Query database
     rows = get_search_data(search_term, criterion)
+    # Error if word has been searched for that doesn't appear in table
+    if rows == False:
+        return apology("word is not part of the 20 most frequent words in any text", 400)
     # Prepare results in results object
     results = prepare_results(rows, "search", None)
 
@@ -105,6 +99,7 @@ def text(search_result):
     rows_fazit = db.execute("SELECT fazit FROM juryfazit WHERE autorin_id = :id",
                             {"id": int(autorin_id)}).fetchall()
     fazit = rows_fazit[0]["fazit"]
+    fazit = fazit.strip()
 
     # Define column width for grid system, if no doughnut chart on the right
     infotable_col_width = 12
