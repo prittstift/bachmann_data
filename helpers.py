@@ -39,7 +39,7 @@ def get_search_data(search_term, criterion):
     if "year" in criterion_list:
         # Day and month of competition to match data in database
         days = {2019: "3006", 2018: "0807", 2017: "0907",
-                2016: "0307", 2015: "0507", 2014: "0607", 2013: "0707", 2012: "0807", 2011: "1007", 2010: "2706"}
+                2016: "0307", 2015: "0507", 2014: "0607", 2013: "0707", 2012: "0807", 2011: "1007", 2010: "2706", 2009: "2806", 2008: "2806", 2007: "0107", 2006: "2506", 2005: "2606", 2004: "2706", 2003: "2906", 2002: "3006", 2001: "0107", 2000: "0207"}
 
         # Add condition to query command
         select += "autorinnen.teilnahmejahr = :year"
@@ -117,7 +117,10 @@ def prepare_results(rows, site, special):
             if (site == "text") or (site == "chart"):
                 self.land = rows[i]["land"]
                 self.wohnort = rows[i]["wohnort"]
-                self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
+                if self.id == 181:
+                    self.geburtsjahr = "im letzten Drittel des 20. Jahrhunderts"
+                else:
+                    self.geburtsjahr = prepare_year(rows[i]["geburtsjahr"])
                 self.vorgetragen_am = rows[i]["vorgetragen_am"]
                 self.link = rows[i]["webseite"]
                 if special == "alter":

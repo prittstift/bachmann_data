@@ -12,7 +12,7 @@
 <div class="row">
   <div class="col">
     <p class="text-center text-secondary">
-      {% if  search_result != 1 %}<a href="/text/{{ search_result  - 1}}" class="card-link">Vorherige</a> {% endif %} {% if  search_result != 139 %}<a href="/text/{{ search_result + 1 }}" class="card-link">Nächste</a> {% endif %}</p>
+      {% if  search_result != 1 %}<a href="/text/{{ search_result  - 1}}" class="card-link">Vorherige</a> {% endif %} {% if  search_result != 304 %}<a href="/text/{{ search_result + 1 }}" class="card-link">Nächste</a> {% endif %}</p>
     <h1 class="display-5 text-center"><strong>{{ result.autorinnenname }}</strong></h1>
     <h1 class="display-5 text-center"><em>{{ result.titel }}</em></h1>
     <h6 class="display-5 text-center text-secondary">{{ result.teilnahmejahr }}</h6>
@@ -70,6 +70,7 @@
   </div>
 </div>
 <br>
+{% if  search_result <= 139 %}
 <div class="row">
   <div class="col">
     <h6 class="display-6 text-center"><a href="/woerterchart" class="card-link">Worthäufigkeit</a></h6>
@@ -82,6 +83,7 @@
     </div>
   </div>
 </div>
+{% endif %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
       <script>
       var ctx = document.getElementById('horizontalChart').getContext('2d');

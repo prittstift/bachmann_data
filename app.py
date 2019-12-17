@@ -91,10 +91,15 @@ def text(search_result):
                       {"text_id": search_result}).fetchall()
     # Prepare results in results object
     results = prepare_results(rows, "text", None)
-    # Prepare data for chart
-    labels, values, max = prepare_woerterchart(woerter, search_result)
 
     autorin_id = rows[0]["id"]
+    labels = []
+    values = []
+    max = 0
+    # Prepare data for chart
+    if autorin_id <= 139:
+        labels, values, max = prepare_woerterchart(woerter, search_result)
+
     # Query database for quotation
     rows_fazit = db.execute("SELECT fazit FROM juryfazit WHERE autorin_id = :id",
                             {"id": int(autorin_id)}).fetchall()
@@ -128,7 +133,7 @@ def text(search_result):
 
         shortlist = ShortList(rows_short)
 
-        return render_template("text_overview.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit, shortlist=shortlist, infotable_col_width=infotable_col_width)
+        return render_template("text_overview.html", search_result=int(search_result), results=results, labels=labels, values=values, max=max, fazit=fazit, shortlist=shortlist, infotable_col_width=infotable_col_width)
     else:
         return render_template("text_overview.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit, infotable_col_width=infotable_col_width)
 
