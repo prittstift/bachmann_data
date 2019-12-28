@@ -1,9 +1,11 @@
 {% extends "layout.html" %}
 
 {% block title %}
+{% if results %}
 {% for result in results %}
     {{ result.autorinnenname }} - {{ result.titel }}
 {% endfor %}
+{% endif %}
 {% endblock %}
 
 {% block main %}
@@ -12,9 +14,11 @@
 <div class="row">
   <div class="col">
     <p class="text-center text-secondary">
-      {% if  search_result != 1 %}<a href="/text/{{ search_result  - 1}}" class="card-link">Vorherige</a> {% endif %} {% if  search_result != 304 %}<a href="/text/{{ search_result + 1 }}" class="card-link">Nächste</a> {% endif %}</p>
+      {% if  search_result != 1 %}<a href="/text/{{ search_result  - 1}}" class="card-link">Vorherige</a> {% endif %} {% if  search_result != 828 %}<a href="/text/{{ search_result + 1 }}" class="card-link">Nächste</a> {% endif %}</p>
     <h1 class="display-5 text-center"><strong>{{ result.autorinnenname }}</strong></h1>
+    {% if  result.titel != "titel" %}
     <h1 class="display-5 text-center"><em>{{ result.titel }}</em></h1>
+    {% endif %}
     <h6 class="display-5 text-center text-secondary">{{ result.teilnahmejahr }}</h6>
     <br>
     <br>
@@ -23,21 +27,26 @@
 <div class="row">
   <div class="col-sm-{{ infotable_col_width }}">
     <dl class="row">
+      {% if  result.land != "land" %}    
       <dt class="col-sm-6 text-left"><a href="/charts/laender" class="card-link">Land</a></dt>
       <dd class="col-sm-6 text-left">{{ result.land }}</dd>
-
+      {% endif %}
+      {% if  result.wohnort != "wohnort" %}
       <dt class="col-sm-6 text-left"><a href="/charts/orte" class="card-link">Wohnort</a></dt>
       <dd class="col-sm-6 text-left">{{ result.wohnort }}</dd>
-
+      {% endif %}
+      {% if  result.geburtsjahr != "geburtsjahr" %}
       <dt class="col-sm-6 text-left"><a href="/alter" class="card-link">Geburtsjahr</a></dt>
       <dd class="col-sm-6 text-left">{{ result.geburtsjahr }}</dd>
-
+      {% endif %}
+      {% if  result.eingeladen_von != "None" %}
       <dt class="col-sm-6 text-left"><a href="/charts/kritikerinnen" class="card-link">Eingeladen von</a></dt>
       <dd class="col-sm-6 text-left">{{ result.eingeladen_von }}</dd>
-
+      {% endif %}
+      {% if  result.vorgetragen_am != "vorgetragen_am" %}
       <dt class="col-sm-6 text-left"><a href="/charts/wochentage" class="card-link">Vorgetragen am</a></dt>
       <dd class="col-sm-6 text-left">{{ result.vorgetragen_am }}</dd>
-
+      {% endif %}
       <dt class="col-sm-6 text-left">Preise gewonnen?</dt>
       <dd class="col-sm-6 text-left">{{ result.preis }}</dd>
 
@@ -61,6 +70,7 @@
     </div>
   </div>
   {% endif %}
+{% if  search_result <= 304 %}
 </div>
 <br>
 <br>
@@ -70,6 +80,7 @@
   </div>
 </div>
 <br>
+{% endif %}
 {% if  search_result <= 139 %}
 <div class="row">
   <div class="col">

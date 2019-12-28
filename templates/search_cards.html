@@ -13,8 +13,15 @@
   </div>
   <div class="card-body">
     <h5 class="card-title text-left">{{ result.autorinnenname }}</h5>
+    {% if result.titel != "titel" %}
     <h6 class="card-text text-left font-italic">{{ result.titel }}</h6>
-    <p class="card-text text-left"> Eingeladen von {{ result.eingeladen_von }} ({{ result.teilnahmejahr }})</p>
+    {% endif  %}
+    <p class="card-text text-left">
+        {% if result.eingeladen_von != "None" %}
+        Eingeladen von {{ result.eingeladen_von }} 
+        {% endif  %}
+        ({{ result.teilnahmejahr }})
+    </p>
     <a class="btn btn-primary" href="/text/{{ result.id }}" role="button">Details</a>
   </div>
 </div>

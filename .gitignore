@@ -1,5 +1,10 @@
 __pycache__/
+jurydiskussionen/
+import.py
+import_juryfazit.py
 import_preise_new.py
+commas.py
+kritiker.txt
 bildungshintergrund.csv
 preise_new.csv
 preise.csv

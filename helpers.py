@@ -39,7 +39,7 @@ def get_search_data(search_term, criterion):
     if "year" in criterion_list:
         # Day and month of competition to match data in database
         days = {2019: "3006", 2018: "0807", 2017: "0907",
-                2016: "0307", 2015: "0507", 2014: "0607", 2013: "0707", 2012: "0807", 2011: "1007", 2010: "2706", 2009: "2806", 2008: "2806", 2007: "0107", 2006: "2506", 2005: "2606", 2004: "2706", 2003: "2906", 2002: "3006", 2001: "0107", 2000: "0207"}
+                2016: "0307", 2015: "0507", 2014: "0607", 2013: "0707", 2012: "0807", 2011: "1007", 2010: "2706", 2009: "2806", 2008: "2806", 2007: "0107", 2006: "2506", 2005: "2606", 2004: "2706", 2003: "2906", 2002: "3006", 2001: "0107", 2000: "0207", 1999: "2706", 1998: "2706", 1997: "2906", 1996: "3006", 1995: "0207", 1994: "2706", 1993: "2706", 1992: "2706", 1991: "2706", 1990: "2706", 1989: "2706", 1988: "2706", 1987: "2706", 1986: "2706", 1985: "2706", 1984: "2706", 1983: "2706", 1982: "2706", 1981: "2706", 1980: "2706", 1979: "2706", 1978: "2706", 1977: "2706"}
 
         # Add condition to query command
         select += "autorinnen.teilnahmejahr = :year"
@@ -89,19 +89,27 @@ def get_search_data(search_term, criterion):
 
 
 def prepare_year(data):
-    # Return year from datetime string
-    year = datetime.datetime.strptime(data, '%d%m%Y').date().year
-    return year
+    if data != "geburtsjahr":
+        # Return year from datetime string
+        year = datetime.datetime.strptime(data, '%d%m%Y').date().year
+        return year
+    else:
+        year = "geburtsjahr"
+        return year
 
 
 def prepare_age(birthday, year):
-    # Return age from datetime strings
-    date_temp = datetime.datetime.strptime(birthday, '%d%m%Y').date()
-    year_temp = datetime.datetime.strptime(year, '%d%m%Y').date()
-    age_temp = year_temp - date_temp
-    age = float(age_temp.days) / 365.25
-    age = round(age, 2)
-    return age
+    if birthday != "geburtsjahr":
+        # Return age from datetime strings
+        date_temp = datetime.datetime.strptime(birthday, '%d%m%Y').date()
+        year_temp = datetime.datetime.strptime(year, '%d%m%Y').date()
+        age_temp = year_temp - date_temp
+        age = float(age_temp.days) / 365.25
+        age = round(age, 2)
+        return age
+    else:
+        age = 40
+        return age
 
 
 def prepare_results(rows, site, special):

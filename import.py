@@ -14,13 +14,13 @@ engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
 # Create table books
-db.execute("CREATE TABLE autorinnen (id SERIAL PRIMARY KEY, autorinnenname VARCHAR(100) NOT NULL, land VARCHAR(100) NOT NULL, wohnort VARCHAR(100) NOT NULL, titel VARCHAR(200) NOT NULL, eingeladen_von VARCHAR(100) NOT NULL, teilnahmejahr VARCHAR(20) NOT NULL, geburtsjahr VARCHAR(50) NOT NULL, geschlecht VARCHAR(20) NOT NULL, vorgetragen_am VARCHAR(20) NOT NULL, preis_gewonnen VARCHAR(20) NOT NULL, wikipedia VARCHAR(20) NOT NULL, webseite VARCHAR(100) NOT NULL)")
+db.execute("CREATE TABLE autorinnen (id SERIAL PRIMARY KEY, autorinnenname VARCHAR(100) NOT NULL, land VARCHAR(100), wohnort VARCHAR(100), titel VARCHAR(200), eingeladen_von VARCHAR(100), teilnahmejahr VARCHAR(20) NOT NULL, geburtsjahr VARCHAR(50) NOT NULL, geschlecht VARCHAR(20) NOT NULL, vorgetragen_am VARCHAR(20), preis_gewonnen VARCHAR(20) NOT NULL, wikipedia VARCHAR(20) NOT NULL, webseite VARCHAR(100))")
 db.commit()
 
 
 # Import data from csv file
 def main():
-    with open('autorinnen_expanded.csv', encoding='utf-8') as f:
+    with open('autorinnen_complete.csv', encoding='utf-8') as f:
         reader = csv.reader(f)
         next(reader)
         for autorinnenname, land, wohnort, titel, eingeladen_von, teilnahmejahr, geburtsjahr, geschlecht, vorgetragen_am, preis_gewonnen, wikipedia, webseite in reader:

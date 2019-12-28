@@ -101,10 +101,13 @@ def text(search_result):
         labels, values, max = prepare_woerterchart(woerter, search_result)
 
     # Query database for quotation
-    rows_fazit = db.execute("SELECT fazit FROM juryfazit WHERE autorin_id = :id",
-                            {"id": int(autorin_id)}).fetchall()
-    fazit = rows_fazit[0]["fazit"]
-    fazit = fazit.strip()
+    if autorin_id <= 304:
+        rows_fazit = db.execute("SELECT fazit FROM juryfazit WHERE autorin_id = :id",
+                                {"id": int(autorin_id)}).fetchall()
+        fazit = rows_fazit[0]["fazit"]
+        fazit = fazit.strip()
+    else:
+        fazit = ""
 
     # Define column width for grid system, if no doughnut chart on the right
     infotable_col_width = 12
@@ -153,7 +156,7 @@ def woerterchart():
 def kritikerinnen(criterion):
     """Show charts by criterion"""
     # Query database (table with individual infos on authors not yet implemented)
-    rows = db.execute("SELECT * FROM autorinnen").fetchall()
+    rows = db.execute("SELECT * FROM autorinnen WHERE id <= 304").fetchall()
     # Safe results in results object
     results = prepare_results(rows, "chart", None)
     # Adjust charts for different criteria
@@ -197,7 +200,7 @@ def kritikerinnen(criterion):
 def alter():
     """Show chart of ages"""
     # Query database
-    rows = db.execute("SELECT * FROM autorinnen").fetchall()
+    rows = db.execute("SELECT * FROM autorinnen WHERE id <= 139").fetchall()
     # Safe results in object
     results = prepare_results(rows, "chart", "alter")
     # Prepare data for scatterplot and line chart
