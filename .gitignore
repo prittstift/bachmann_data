@@ -1,7 +1,12 @@
 __pycache__/
 jurydiskussionen/
 import.py
+import_alter.py
+import_chart_table.py
 import_juryfazit.py
+import_kritikerpreis.py
+import_landpreis.py
+import_ortpreis.py
 import_preise_new.py
 commas.py
 kritiker.txt
