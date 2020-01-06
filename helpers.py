@@ -195,13 +195,13 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
             if col == "ort":
                 relevance_border_bar = 2
             if col == "land":
-                relevance_border_bar = 5
+                relevance_border_bar = 6
             if col == "kritikerin":
                 relevance_border_bar = 5
 
             relevance_border_percent = 0
             if col == "land":
-                relevance_border_percent = 3
+                relevance_border_percent = 6
             if col == "ort":
                 relevance_border_percent = 1
 

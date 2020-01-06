@@ -161,6 +161,7 @@ def kritikerinnen(criterion):
     results = prepare_results(rows, "chart", None)
     # Adjust charts for different criteria
     percent_chart_height = 60
+    header_time = "(2010-2019)"
     if criterion == "kritikerinnen":
         table = "kritikerpreis"
         col = "kritikerin"
@@ -169,8 +170,9 @@ def kritikerinnen(criterion):
         criterion = "länder"
         table = "landpreis"
         col = "land"
-        max_bar = 90
+        max_bar = 500
         percent_chart_height = 20
+        header_time = "(1977-2019)"
     elif criterion == "orte":
         table = "ortpreis"
         col = "ort"
@@ -193,7 +195,7 @@ def kritikerinnen(criterion):
     # Safe results in object with all chart data
     chartdata = prepare_barchart(col, rows_preis, rows_preis_percent)
 
-    return render_template("barcharts.html", criterion=criterion.title(), max_bar=max_bar, percent_chart_height=percent_chart_height, results=results, chartdata=chartdata)
+    return render_template("barcharts.html", criterion=criterion.title(), max_bar=max_bar, percent_chart_height=percent_chart_height, results=results, chartdata=chartdata, header_time=header_time)
 
 # page with chart on age
 @app.route("/alter", methods=["GET"])
