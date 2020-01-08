@@ -176,7 +176,8 @@ def kritikerinnen(criterion):
     elif criterion == "orte":
         table = "ortpreis"
         col = "ort"
-        max_bar = 50
+        max_bar = 350
+        header_time = "(1977-2019)"
     elif criterion == "wochentage":
         table = "vortragspreis"
         col = "vorgetragen_am"
@@ -185,8 +186,9 @@ def kritikerinnen(criterion):
     elif criterion == "gender":
         table = "geschlechtpreis"
         col = "geschlecht"
-        max_bar = 80
+        max_bar = 600
         percent_chart_height = 20
+        header_time = "(1977-2019)"
     # Query chart table
     rows_preis = db.execute("SELECT * FROM {} ORDER BY total DESC".format(table)).fetchall()
     # Query chart table
@@ -202,7 +204,7 @@ def kritikerinnen(criterion):
 def alter():
     """Show chart of ages"""
     # Query database
-    rows = db.execute("SELECT * FROM autorinnen WHERE id <= 139").fetchall()
+    rows = db.execute("SELECT * FROM autorinnen WHERE id != 181").fetchall()
     # Safe results in object
     results = prepare_results(rows, "chart", "alter")
     # Prepare data for scatterplot and line chart

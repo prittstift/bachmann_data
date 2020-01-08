@@ -404,7 +404,7 @@ Karina Kranhold,Deutschland,Marburg,titel,None,27061994,geburtsjahr,w,vorgetrage
 Dagmar Leupold,Deutschland,"Eglharting bei München",titel,None,27061994,23101955,w,vorgetragen_am,False,True,webseite
 Stefanie Menzinger,Deutschland,"Liebaja (Lettland)","Der Gärtner, der Kater und ich",None,27061994,24031965,w,vorgetragen_am,True,True,webseite
 Klaus Modick,Deutschland,Wiefelstede,titel,None,27061994,03051951,m,vorgetragen_am,False,True,webseite
-Sibylle Mulot,Deutschland,"Lure (Franche-Comté, Frankreich)",titel,None,27061994,03051950,w,vorgetragen_am,False,True,webseite
+Sibylle Mulot,Deutschland,"Lure (Franche-Comté,Frankreich)",titel,None,27061994,03051950,w,vorgetragen_am,False,True,webseite
 Heidi von Plato,Deutschland,Berlin,titel,None,27061994,01071954,w,vorgetragen_am,False,True,webseite
 Doron Rabinovici,Österreich,Wien,"Mullemann",None,27061994,02121961,m,vorgetragen_am,True,True,webseite
 Urs Richle,Schweiz,Genf,titel,None,27061994,24061965,m,vorgetragen_am,False,True,webseite
@@ -649,7 +649,7 @@ Godehard Schramm,"Deutschland (BRD)",Nürnberg,titel,None,27061983,24121943,m,"1
 Wolfgang Linder,Österreich,Rankweil,"Dunst",None,27061983,07081961,m,"1. Lesetag",True,True,webseite
 Martin Mosebach,"Deutschland (BRD)","Frankfurt/Main",titel,None,27061983,31071951,m,"1. Lesetag",False,True,webseite
 Hansjörg Schertenleib,Schweiz,Zürich,titel,None,27061983,04111957,m,"2. Lesetag",False,True,webseite
-Birgit Pausch,"Deutschland (BRD)",FLorenz,titel,None,27061983,07021942,w,"2. Lesetag",False,True,webseite
+Birgit Pausch,"Deutschland (BRD)",Florenz,titel,None,27061983,07021942,w,"2. Lesetag",False,True,webseite
 Lisa Witasek,Österreich,Salzburg,"Die Umarmung",None,27061983,08031956,w,"2. Lesetag",False,True,webseite
 Romie Lie,Schweiz,Bern,titel,None,27061983,07061954,w,"2. Lesetag",False,True,webseite
 Roland Lang,"Deutschland (BRD)",Karlsruhe,titel,None,27061983,02041942,m,"2. Lesetag",False,True,webseite
@@ -684,7 +684,7 @@ Jürgen Lodemann,"Deutschland (BRD)",Baden-Baden,titel,None,27061982,28031936,m,
 Engelbert Obernosterer,Österreich,Hermagor,titel,None,27061982,28121936,m,vorgetragen_am,False,True,webseite
 Hanns-Josef Ortheil,"Deutschland (BRD)",Wiesbaden,titel,None,27061982,05111951,m,vorgetragen_am,False,True,webseite
 Udo Rabsch,"Deutschland (BRD)",Stuttgart,titel,None,27061982,01071944,m,vorgetragen_am,False,True,webseite
-Gerald Szyszkowitz,Österreich,WIen,titel,None,27061982,22071938,m,vorgetragen_am,False,True,webseite
+Gerald Szyszkowitz,Österreich,Wien,titel,None,27061982,22071938,m,vorgetragen_am,False,True,webseite
 Einar Schleef,"Deutschland (BRD)",Berlin,titel,None,27061982,17011944,m,vorgetragen_am,False,True,webseite
 Erasmus Schöfer,"Deutschland (BRD)",Köln,titel,None,27061982,04061931,m,vorgetragen_am,False,True,webseite
 Lothar Schöne,"Deutschland (BRD)",Mainz,titel,None,27061982,16071949,m,vorgetragen_am,False,True,webseite
@@ -760,7 +760,7 @@ Ernst-Jürgen Dreyer,"Deutschland (BRD)",Murnau,titel,None,27061979,20081934,m,v
 Gunter Falk,Österreich,Graz,titel,None,27061979,26101942,m,vorgetragen_am,False,True,webseite
 Maria Felsenreich,Österreich,Wien,titel,None,27061979,geburtsjahr,w,vorgetragen_am,False,False,webseite
 Markus Fenner,"Deutschland (BRD)",München-Pullach,titel,None,27061979,geburtsjahr,m,vorgetragen_am,False,False,webseite
-Marianne Gruber,Österreich,WIen,titel,None,27061979,04061944,w,vorgetragen_am,False,True,webseite
+Marianne Gruber,Österreich,Wien,titel,None,27061979,04061944,w,vorgetragen_am,False,True,webseite
 Lukas Hartmann,Schweiz,Bern,titel,None,27061979,29081944,m,vorgetragen_am,False,True,webseite
 Gert Hofmann,"Deutschland (BRD)",Klagenfurt,"Die Fistelstimme",None,27061979,29011931,m,vorgetragen_am,True,True,webseite
 Heribert Hopf,"Deutschland (BRD)",München,titel,None,27061979,14021936,m,vorgetragen_am,False,True,webseite
@@ -797,7 +797,7 @@ Angelika Mechtel,"Deutschland (BRD)",München,titel,None,27061978,26081943,w,vor
 Engelbert Obernosterer,Österreich,Hermagor,titel,None,27061978,28121936,m,vorgetragen_am,False,True,webseite
 Hanns-Josef Ortheil,"Deutschland (BRD)",Wiesbaden,titel,None,27061978,05111951,m,vorgetragen_am,False,True,webseite
 Erika Pedretti,Schweiz,La Neuveville,titel,None,27061978,25021930,w,vorgetragen_am,False,True,webseite
-Ulrich Plenzdorf,"Deutschland (DDR)",Berlin,kein runter kein fern,None,27061978,26101934,m,vorgetragen_am,False,True,webseite
+Ulrich Plenzdorf,"Deutschland (DDR)",Berlin,kein runter kein fern,None,27061978,26101934,m,vorgetragen_am,True,True,webseite
 Peter Renz,"Deutschland (BRD)",Weingarten,titel,None,27061978,08061946,m,vorgetragen_am,False,True,webseite
 Eva Schindler,"Deutschland (BRD)",München,titel,None,27061978,12051930,w,vorgetragen_am,False,True,webseite
 Jutta Schutting,Österreich,Wien,titel,None,27061978,25101937,w,vorgetragen_am,False,True,webseite
@@ -815,7 +815,7 @@ Dieter Kühn,"Deutschland (BRD)",Düren,titel,None,27061977,01021935,m,"1. Leset
 Jürg Laederach,Schweiz,Bottmingen,titel,None,27061977,20121945,m,"2. Lesetag",False,True,webseite
 Gert Jonke,Österreich,Klagenfurt,"Erster Entwurf zum Beginn einer sehr langen Erzählung",None,27061977,08021946,m,"2. Lesetag",True,True,webseite
 Karin Struck,"Deutschland (BRD)",Münster,titel,None,27061977,14051947,w,"2. Lesetag",False,True,webseite
-Uwe Bolius,Österreich,WIen,titel,None,27061977,06081940,m,"2. Lesetag",False,True,webseite
+Uwe Bolius,Österreich,Wien,titel,None,27061977,06081940,m,"2. Lesetag",False,True,webseite
 Marie-Thérèse Kerschbaumer,Österreich,Wien,titel,None,27061977,31081936,w,"2. Lesetag",False,True,webseite
 Herbert Eisenreich,Österreich,Tamsweg,titel,None,27061977,07021925,m,"2. Lesetag",False,True,webseite
 Hans-Jürgen Fröhlich,"Deutschland (BRD)",München,"Einschüchterungsversuche",None,27061977,04081932,m,"2. Lesetag",True,True,webseite

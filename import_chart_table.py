@@ -14,9 +14,9 @@ engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
 # Choose name for new table and column to get data from: geschlechtpreis - geschlecht - geschlecht / vortragspreis - vorgetragen_am - vorgetragen_am
-tablename = "vortragspreis"
-criterion = "vorgetragen_am"
-col = "vorgetragen_am"
+tablename = "geschlechtpreis"
+criterion = "geschlecht"
+col = "geschlecht"
 
 # Create table
 db.execute("CREATE TABLE {} (id SERIAL PRIMARY KEY, {} VARCHAR(40) NOT NULL, preis_true INTEGER NOT NULL, preis_false INTEGER NOT NULL, total INTEGER NOT NULL, percent FLOAT NOT NULL, bachmann_preis INTEGER NOT NULL)".format(tablename, criterion))
@@ -40,7 +40,7 @@ def main():
             self.col = rows[i][col]
 
             if rows[i]["preis_gewonnen"] == "True":
-                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
+                rows_prices = db.execute("SELECT preistitel FROM preise_new WHERE autorinnen_id = :name",
                                          {"name": rows[i]["id"]}).fetchall()
                 self.preis = ""
                 for j in range(len(rows_prices)):

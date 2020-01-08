@@ -34,7 +34,7 @@ def main():
             self.wohnort = rows[i]["wohnort"]
             self.geburtsjahr = rows[i]["geburtsjahr"]
             if rows[i]["preis_gewonnen"] == "True":
-                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
+                rows_prices = db.execute("SELECT preistitel FROM preise_new WHERE autorinnen_id = :name",
                                          {"name": rows[i]["id"]}).fetchall()
                 self.preis = ""
                 for j in range(len(rows_prices)):
@@ -50,6 +50,8 @@ def main():
 
     labels = []
     for result in results:
+        if result.wohnort == "wohnort":
+            result.wohnort = "unbekannt"
         if result.wohnort not in labels:
             if ", " in result.wohnort:
                 split_land = result.wohnort.split(", ")

@@ -193,7 +193,7 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
             # Define which labels are shown individually by setting min number of value
             relevance_border_bar = 0
             if col == "ort":
-                relevance_border_bar = 2
+                relevance_border_bar = 10
             if col == "land":
                 relevance_border_bar = 6
             if col == "kritikerin":
@@ -203,7 +203,7 @@ def prepare_barchart(col, rows_preis, rows_preis_percent):
             if col == "land":
                 relevance_border_percent = 6
             if col == "ort":
-                relevance_border_percent = 1
+                relevance_border_percent = 10
 
             if relevance_border_bar != 0:
                 temp_values_priceless = 0
