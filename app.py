@@ -6,6 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import apology, login_required, get_search_data, prepare_results, prepare_barchart, prepare_age, prepare_year, prepare_woerterchart, prepare_publications, prepare_autorin_link
 from woerter import woerter
 import os
+import math
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -198,9 +199,10 @@ def kritikerinnen(criterion):
     elif criterion == "wochentage":
         table = "vortragspreis"
         col = "vorgetragen_am"
-        max_bar = 50
+        max_bar = 130
         percent_chart_height = 20
-    elif criterion == "gender":
+        header_time = "(1998-2019)"
+    elif criterion == "w-m":
         table = "geschlechtpreis"
         col = "geschlecht"
         max_bar = 600
@@ -228,28 +230,13 @@ def alter():
     kein_Preis = []
     bachmannpreis = []
     andere_Preise = []
-    preise = []
-    alter = []
-    publikum_temp = []
-    publikum_avg = 0
     for result in results:
-        dict = {}
-        dict[True] = result.teilnahmejahr
-        dict[False] = result.alter
-        alter.append(dict)
         if result.preis == "Fehlanzeige":
             dict = {}
             dict[True] = result.teilnahmejahr
             dict[False] = result.alter
             kein_Preis.append(dict)
         if result.preis != "Fehlanzeige":
-            dict = {}
-            dict[True] = result.teilnahmejahr
-            dict[False] = result.alter
-            preise.append(dict)
-            if result.publikum == True:
-                publikum_temp.append(result.alter)
-                publikum_avg += result.alter
             if result.bachmann == True:
                 dict = {}
                 dict[True] = result.teilnahmejahr
@@ -260,11 +247,33 @@ def alter():
                 dict[True] = result.teilnahmejahr
                 dict[False] = result.alter
                 andere_Preise.append(dict)
+    
+    rows_alter = db.execute("SELECT * FROM alterpreis").fetchall()
 
-    publikum = list(reversed(publikum_temp))
-    publikum_avg = round((publikum_avg / len(publikum)), 2)
+    class Result_alter:
+            def __init__(self, rows_alter, i):
+                self.jahr = rows_alter[i]["jahr"]
+                self.gruppe = rows_alter[i]["gruppe"]
+                if math.isnan(rows_alter[i]["alter"]) == True:
+                    self.alter = ""
+                else:
+                    self.alter = rows_alter[i]["alter"]
 
-    return render_template("alter.html", results=results, kein_Preis=kein_Preis, bachmannpreis=bachmannpreis, andere_Preise=andere_Preise, preise=preise, alter=alter, publikum=publikum, publikum_avg=publikum_avg)
+    results_alter = []
+    for i in range(len(rows_alter)):
+            results_alter.append(Result_alter(rows_alter, i))
+
+    for result in results_alter:
+        if result.jahr == "abs" and result.gruppe == "absolut":
+            alter_absolut = result.alter
+        if result.jahr == "abs" and result.gruppe == "preis_gewonnen":
+            alter_preis_gewonnen = result.alter
+        if result.jahr == "abs" and result.gruppe == "bachmann":
+            alter_bachmann = result.alter
+        if result.jahr == "abs" and result.gruppe == "publikum":
+            alter_publikum = result.alter
+
+    return render_template("alter.html", results=results, kein_Preis=kein_Preis, bachmannpreis=bachmannpreis, andere_Preise=andere_Preise, alter_absolut=alter_absolut, alter_preis_gewonnen=alter_preis_gewonnen, alter_bachmann=alter_bachmann, alter_publikum=alter_publikum, results_alter=results_alter)
 
 # logic for login page (if implemented in the future)
 @app.route("/login", methods=["GET", "POST"])

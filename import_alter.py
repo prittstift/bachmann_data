@@ -1,11 +1,8 @@
-import csv
+import pandas as pd
+import numpy as np
 import os
-import datetime
-
-from datetime import date
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-from helpers import prepare_age
 
 
 # Check for environment variable
@@ -16,82 +13,76 @@ if not os.getenv("DATABASE_URL"):
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
-# Create table books
-db.execute("CREATE TABLE kritikerpreis (id SERIAL PRIMARY KEY, kritikerin VARCHAR(40) NOT NULL, preis_true INTEGER NOT NULL, preis_false INTEGER NOT NULL, total INTEGER NOT NULL, percent FLOAT NOT NULL, bachmann_preis INTEGER NOT NULL)")
+
+# Query database
+
+data_stream = pd.read_sql("SELECT autorinnen.id, autorinnen.teilnahmejahr, autorinnen.geburtsjahr, autorinnen.preis_gewonnen, preise_new.preistitel FROM autorinnen JOIN preise_new ON autorinnen.id = preise_new.autorinnen_id", con=engine, index_col='id')
+
+# rows = db.execute("SELECT autorinnen.id, autorinnen.autorinnenname, autorinnen.titel, autorinnen.eingeladen_von, autorinnen.teilnahmejahr FROM autorinnen JOIN preise_new ON autorinnen.id = preise_new.autorinnen_id").fetchall()
+
+temp = data_stream[data_stream['geburtsjahr'].map(lambda x: str(x)!="geburtsjahr")]
+
+data = temp[temp['geburtsjahr'].map(lambda x: str(x)!="im letzten Drittel des 20. Jahrhunderts")]
+
+data['geburtsjahr'] = pd.to_datetime(data['geburtsjahr'], format='%d%m%Y')
+
+data['teilnahmejahr'] = pd.to_datetime(data['teilnahmejahr'], format='%d%m%Y')
+
+data["alter"] = data.apply(
+    lambda row: row["teilnahmejahr"] - row["geburtsjahr"], axis=1)
+
+data.drop(['geburtsjahr'], axis=1)
+
+data["alter"] = data["alter"] / np.timedelta64(1, 'Y')
+
+data["alter"] = round(data["alter"], 2)
+
+data['teilnahmejahr'] = data['teilnahmejahr'].dt.year
+
+# Create table
+db.execute("CREATE TABLE alterpreis (id SERIAL PRIMARY KEY, jahr VARCHAR(40) NOT NULL, gruppe VARCHAR(100), alter FLOAT NOT NULL)")
 db.commit()
 
-# Import data from csv file
+temp_preis = data[data['preis_gewonnen'].map(lambda x: str(x)=="True")]
+temp_bachmann = data[data['preistitel'].map(lambda x: "Ingeborg-Bachmann-Preis" in str(x))]
+temp_publikum = data[data['preistitel'].map(lambda x: "Publikumspreis" in str(x))]
 
+mean_preis = round(temp_preis["alter"].mean(), 2)
+mean_bachmann = round(temp_bachmann["alter"].mean(), 2)
+mean_publikum = round(temp_publikum["alter"].mean(), 2)
 
-def main():
-    rows = db.execute("SELECT * FROM autorinnen").fetchall()
+mean_abs = round(data["alter"].mean(), 2)
 
-    class FoundText:
-        def __init__(self, rows, i):
-            self.autorinnenname = rows[i]["autorinnenname"]
-            self.titel = rows[i]["titel"]
-            self.eingeladen_von = rows[i]["eingeladen_von"]
-            self.teilnahmejahr = rows[i]["teilnahmejahr"]
-            self.id = rows[i]["id"]
-            self.land = rows[i]["land"]
-            self.wohnort = rows[i]["wohnort"]
-            self.geburtsjahr = rows[i]["geburtsjahr"]
-            self.alter = prepare_age(rows[i]["geburtsjahr"], rows[i]["teilnahmejahr"])
-            if rows[i]["preis_gewonnen"] == "True":
-                rows_prices = db.execute("SELECT preistitel FROM preise WHERE autorinnen_id = :name",
-                                         {"name": rows[i]["id"]}).fetchall()
-                self.preis = ""
-                for j in range(len(rows_prices)):
-                    self.preis += rows_prices[j]["preistitel"]
-                    if (j >= 0) and (j < (len(rows_prices) - 1)):
-                        self.preis += ", "
-            else:
-                self.preis = "Fehlanzeige"
+gruppen_abs = {"absolut": mean_abs, "preis_gewonnen": mean_preis, "bachmann": mean_bachmann, "publikum": mean_publikum}
 
-    results = []
-    for i in range(len(rows)):
-        results.append(FoundText(rows, i))
+for gruppe in gruppen_abs.keys():
+    db.execute("INSERT INTO alterpreis (jahr, gruppe, alter) VALUES (:jahr, :gruppe, :alter)", {"jahr": "abs", "gruppe": gruppe, "alter": gruppen_abs[gruppe]})
+    db.commit()
 
-    labels = []
-    for result in results:
-        labels.append(result.id)
+print(data)
 
-    years = []
-    for result in results:
-        years.append(result.teilnahmejahr)
+print("Absoluter Durchschnitt: " + str(mean_abs))
+print("Absoluter Durchschnitt (Preis gewonnen): " + str(mean_preis))
+print("Absoluter Durchschnitt (Bachmannpreis): " + str(mean_bachmann))
+print("Absoluter Durchschnitt (Publikumspreis): " + str(mean_publikum))
 
-    ages = []
-    for result in results:
-        ages.append(result.alter)
-
-    values_priceless = []
-    values_price = []
-    values_bachmann = []
-    for label in labels:
-        i = 0
-        j = 0
-        k = 0
-        for result in results:
-            if result.teilnahmejahr == label:
-                if result.preis == "Fehlanzeige":
-                    i += 1
-                if result.preis != "Fehlanzeige":
-                    j += 1
-                    if "Ingeborg-Bachmann-Preis" in result.preis:
-                        k += 1
-        values_priceless.append(i)
-        values_price.append(j)
-        values_bachmann.append(k)
-    print(labels)
-    print(values_priceless)
-    print(values_price)
-    print(values_bachmann)
-
-    for l in range(len(labels)):
-        db.execute("INSERT INTO kritikerpreis (id, preis_true, preis_false, total, percent, bachmann_preis) VALUES (:kritikerin, :preis_true, :preis_false, :total, :percent, :bachmann_preis)", {
-                   "kritikerin": labels[l], "preis_true": values_price[l], "preis_false": values_priceless[l], "total": (values_price[l] + values_priceless[l]), "percent": ((values_price[l] / (values_price[l] + values_priceless[l])) * 100), "bachmann_preis": values_bachmann[l]})
+for year in range(1977,2020):
+    temp = data[data['teilnahmejahr'].map(lambda x: int(x)==year)]
+    temp_preis = temp[temp['preis_gewonnen'].map(lambda x: str(x)=="True")]
+    temp_bachmann = temp_preis[temp_preis['preistitel'].map(lambda x: "Ingeborg-Bachmann-Preis" in str(x))]
+    temp_publikum = temp_preis[temp_preis['preistitel'].map(lambda x: "Publikumspreis" in str(x))]
+    mean_temp = round(temp["alter"].mean(), 2)
+    mean_temp_preis = round(temp_preis["alter"].mean(), 2)
+    age_temp_bachmann = round(temp_bachmann["alter"].mean(), 2)
+    age_temp_publikum = round(temp_publikum["alter"].mean(), 2)
+    gruppen = {"absolut": mean_temp, "preis_gewonnen": mean_temp_preis, "bachmann": age_temp_bachmann, "publikum": age_temp_publikum}
+    
+    for gruppe in gruppen.keys():
+        db.execute("INSERT INTO alterpreis (jahr, gruppe, alter) VALUES (:jahr, :gruppe, :alter)", {"jahr": year, "gruppe": gruppe, "alter": gruppen[gruppe]})
         db.commit()
 
+    print("Durchschnitt ({}): ".format(year) + str(mean_temp))
+    print("Durchschnitt ({})(Preis gewonnen): ".format(year) + str(mean_temp_preis))
+    print("Durchschnitt ({})(Bachmannpreis): ".format(year) + str(age_temp_bachmann))
+    print("Durchschnitt ({})(Publikumspreis): ".format(year) + str(age_temp_publikum))
 
-if __name__ == "__main__":
-    main()

@@ -88,104 +88,40 @@
                           }
                   }
               });
-              var preise = {{ preise }};
-              var alter = {{ alter }};
-              function generateAvg(list) {
-                  var data = [];
-                  var a = 0;
-                  var b = 0;
-                  var c = 0;
-                  var d = 0;
-                  var e = 0;
-                  var f = 0;
-                  var g = 0;
-                  var h = 0;
-                  var j = 0;
-                  var k = 0;
-                  var l = 0;
-                  var m = 0;
-                  for (var i = 0; i < list.length; i++) {
-                    if (list[i]['True'] === 2014) {
-                        a += list[i]['False'];
-                        g++
-                    };
-                    if (list[i]['True'] === 2015) {
-                        b += list[i]['False'];
-                        h++
-                    };
-                    if (list[i]['True'] === 2016) {
-                        c += list[i]['False'];
-                        j++
-                    };
-                    if (list[i]['True'] === 2017) {
-                        d += list[i]['False'];
-                        k++
-                    };
-                    if (list[i]['True'] === 2018) {
-                        e += list[i]['False'];
-                        l++
-                    };
-                    if (list[i]['True'] === 2019) {
-                        f += list[i]['False'];
-                        m++
-                    };
-                  }
-                  data.push(Math.round((a / g) * 100) / 100);
-                  data.push(Math.round((b / h) * 100) / 100);
-                  data.push(Math.round((c / j) * 100) / 100);
-                  data.push(Math.round((d / k) * 100) / 100);
-                  data.push(Math.round((e / l) * 100) / 100);
-                  data.push(Math.round((f / m) * 100) / 100);
-                  return data;
-              };
-
-              function generateglobalAvg(list) {
-              var alter_avg = 0;
-              for (var i = 0; i < list.length; i++) {
-                alter_avg += list[i]};
-              alter_avg = Math.round((alter_avg / list.length) * 100 / 100)
-              data = []
-              for (var i = 0; i < list.length; i++) {
-                data.push(alter_avg)};
-              return data;
-            };
-
+                
 
               var ctx = document.getElementById('lineChart').getContext('2d');
 
               var myChart = new Chart(ctx, {
                   type: 'line',
                   data: {
-                      labels: [2014, 2015, 2016, 2017, 2018, 2019],
+                      labels: [1977, 1978,1979,1980,1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019
+                      ],
                       datasets: [{
-                          label: 'Preis gewonnen',
-                          data: generateAvg(preise),
-                          fill: false,
-                          showLine: false,
-                          backgroundColor: 'rgba(53, 90, 234, 0.2)',
-                          borderColor: 'rgba(53, 90, 234, 1)',
-                          borderWidth: 1
-                      }, {
-                          label: 'Preis gewonnen (global)',
-                          data: generateglobalAvg(generateAvg(preise)),
-                          fill: false,
-                          borderDash: [5, 5],
-                          pointStyle: 'dash',
-                          pointRadius: 0,
-                          backgroundColor: 'rgba(53, 90, 234, 0.2)',
-                          borderColor: 'rgba(53, 90, 234, 1)',
-                          borderWidth: 1
-                      }, {
                           label: 'alle Autorinnen',
-                          data: generateAvg(alter),
+                          data: [
+                          {% for result in results_alter %}
+                          {% if result.jahr != "abs" %}
+                          {% if result.gruppe == "absolut" %}
+                              {{ result.alter }},
+                          {% endif %}
+                          {% endif %}
+                          {% endfor %}
+                          ],
                           fill: false,
-                          showLine: false,
+                          showLine: true,
                           backgroundColor: 'rgba(53, 234, 156, 0.2)',
                           borderColor: 'rgba(53, 234, 156, 1)',
                           borderWidth: 1
                       }, {
-                          label: 'alle Autorinnen (global)',
-                          data: generateglobalAvg(generateAvg(alter)),
+                          label: 'alle Autorinnen (abs)',
+                          data: [
+                          {% for result in results_alter %}
+                          {% if result.jahr != "abs" %}
+                                {{ alter_absolut }},
+                          {% endif %}
+                          {% endfor %}
+                          ],
                           fill: false,
                           borderDash: [5, 5],
                           pointStyle: 'dash',
@@ -194,22 +130,36 @@
                           borderColor: 'rgba(53, 234, 156, 1)',
                           borderWidth: 1
                       }, {
-                          label: 'Publikumspreis',
-                          data: {{ publikum }},
+                          label: 'Bachmann-Preis',
+                          data: [
+                          {% for result in results_alter %}
+                          {% if result.jahr != "abs" %}
+                          {% if result.gruppe == "bachmann" %}
+                              {{ result.alter }},
+                          {% endif %}
+                          {% endif %}
+                          {% endfor %}
+                          ],
                           fill: false,
-                          showLine: false,
-                          backgroundColor: 'rgba(234, 138, 53, 0.2)',
-                          borderColor: 'rgba(234, 138, 53, 1)',
+                          showLine: true,
+                          backgroundColor: 'rgba(231, 53, 234, 0.2)',
+                          borderColor: 'rgba(231, 53, 234, 1)',
                           borderWidth: 1
                       },  {
-                          label: 'Publikumspreis (global)',
-                          data: [{%for datum in publikum %}{{ publikum_avg }}, {% endfor %}],
+                          label: 'Bachmann-Preis (abs)',
+                          data: [
+                          {% for result in results_alter %}
+                          {% if result.jahr != "abs" %}
+                                {{ alter_bachmann }},
+                          {% endif %}
+                          {% endfor %}
+                          ],
                           fill: false,
                           borderDash: [5, 5],
                           pointStyle: 'dash',
                           pointRadius: 0,
-                          backgroundColor: 'rgba(234, 138, 53, 0.2)',
-                          borderColor: 'rgba(234, 138, 53, 1)',
+                          backgroundColor: 'rgba(231, 53, 234, 0.2)',
+                          borderColor: 'rgba(231, 53, 234, 1)',
                           borderWidth: 1
                       }]
                   },
@@ -226,6 +176,11 @@
                                   beginAtZero: true,
                                   max: 60,
                                   min: 20
+                              }
+                          }],
+                          xAxes: [{
+                              ticks: {
+                                  autoSkip: true
                               }
                           }]
                       }

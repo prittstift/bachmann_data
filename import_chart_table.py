@@ -14,9 +14,9 @@ engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
 # Choose name for new table and column to get data from: geschlechtpreis - geschlecht - geschlecht / vortragspreis - vorgetragen_am - vorgetragen_am
-tablename = "geschlechtpreis"
-criterion = "geschlecht"
-col = "geschlecht"
+tablename = "vortragspreis"
+criterion = "vorgetragen_am"
+col = "vorgetragen_am"
 
 # Create table
 db.execute("CREATE TABLE {} (id SERIAL PRIMARY KEY, {} VARCHAR(40) NOT NULL, preis_true INTEGER NOT NULL, preis_false INTEGER NOT NULL, total INTEGER NOT NULL, percent FLOAT NOT NULL, bachmann_preis INTEGER NOT NULL)".format(tablename, criterion))
@@ -24,7 +24,7 @@ db.commit()
 
 
 def main():
-    rows = db.execute("SELECT * FROM autorinnen").fetchall()
+    rows = db.execute("SELECT * FROM autorinnen WHERe id <= 336").fetchall()
 
     class FoundText:
         def __init__(self, rows, i):
