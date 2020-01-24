@@ -49,9 +49,52 @@
       {% endif %}
       <dt class="col-sm-6 text-left">Preise gewonnen?</dt>
       <dd class="col-sm-6 text-left">{{ result.preis }}</dd>
-
       <dt class="col-sm-6 text-left">Link</dt>
       <dd class="col-sm-6 text-left"><a class="btn btn-primary" href="{{ result.link }}"  target="_blank" role="button">Webseite</a></dd>
+      {% if search_result <= 304 %}
+      <dt class="col-sm-6 text-left">Publikationen</dt>
+      <dd class="col-sm-6 text-left">
+          <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapsePubl" aria-expanded="false" aria-controls="collapsePubl">
+            Liste ({{ sum_publications }})
+          </button>
+      </dd>
+      <div class="collapse" id="collapsePubl">
+          <div class="card card-body">
+              <p>Publikationen auf <strong><i><a href="{{ autorin_link }}" target="_blank" class="card-link">perlentaucher.de</a></i></strong></p>
+              <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Titel</th>
+                      <th scope="col">Verlag</th>
+                      <th scope="col">Jahr</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for publication in publications %}
+                    {% if publication.titel == "None" %}
+                    <tr>
+                      <th scope="row">*</th>
+                      <td>keine</td>
+                      <td>Einträge</td>
+                      <td>vorhanden</td>  
+                    </tr>
+                    {% endif %}
+                    {% if publication.titel != "None" %}
+                    <tr>
+                      <th scope="row">{{ publication.id }}</th>
+                      <td>{{ publication.titel }}</td>
+                      <td>{{ publication.verlag }}</td>
+                      <td>{{ publication.jahr }}</td>   
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                  </tbody>
+              </table>
+          </div>
+      </div>
+      <br>
+      {% endif %}
     </dl>
   </div>
   {% if shortlist %}
@@ -70,7 +113,7 @@
     </div>
   </div>
   {% endif %}
-{% if  search_result <= 304 %}
+{% if search_result <= 304 %}
 </div>
 <br>
 <br>

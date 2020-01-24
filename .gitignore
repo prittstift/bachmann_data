@@ -1,5 +1,6 @@
 __pycache__/
 jurydiskussionen/
+scraping/
 import.py
 import_alter.py
 import_chart_table.py

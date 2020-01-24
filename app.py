@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, request, session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import apology, login_required, get_search_data, prepare_results, prepare_barchart, prepare_age, prepare_year, prepare_woerterchart
+from helpers import apology, login_required, get_search_data, prepare_results, prepare_barchart, prepare_age, prepare_year, prepare_woerterchart, prepare_publications, prepare_autorin_link
 from woerter import woerter
 import os
 from sqlalchemy import create_engine
@@ -100,14 +100,31 @@ def text(search_result):
     if autorin_id <= 139:
         labels, values, max = prepare_woerterchart(woerter, search_result)
 
-    # Query database for quotation
+    
     if autorin_id <= 304:
+        # Query database for quotation
         rows_fazit = db.execute("SELECT fazit FROM juryfazit WHERE autorin_id = :id",
                                 {"id": int(autorin_id)}).fetchall()
         fazit = rows_fazit[0]["fazit"]
         fazit = fazit.strip()
+        
+        # Query database for publications
+        autorin_name = rows[0]["autorinnenname"]
+        autorin_link = prepare_autorin_link(autorin_name)
+        
+        rows_publ = db.execute("SELECT * FROM perlentaucher_publikationen WHERE autorinnen_id = :text_id",
+                      {"text_id": autorin_id}).fetchall()
+        
+        publications = prepare_publications(rows_publ)
+        sum_publications = len(publications)
+        if rows_publ[0][2] == "None":
+            sum_publications = 0
+        
     else:
         fazit = ""
+        publications = []
+        sum_publications = 0
+        autorin_link = ""
 
     # Define column width for grid system, if no doughnut chart on the right
     infotable_col_width = 12
@@ -136,9 +153,9 @@ def text(search_result):
 
         shortlist = ShortList(rows_short)
 
-        return render_template("text_overview.html", search_result=int(search_result), results=results, labels=labels, values=values, max=max, fazit=fazit, shortlist=shortlist, infotable_col_width=infotable_col_width)
+        return render_template("text_overview.html", search_result=int(search_result), results=results, publications=publications, sum_publications=sum_publications, autorin_link=autorin_link, labels=labels, values=values, max=max, fazit=fazit, shortlist=shortlist, infotable_col_width=infotable_col_width)
     else:
-        return render_template("text_overview.html", search_result=search_result, results=results, labels=labels, values=values, max=max, fazit=fazit, infotable_col_width=infotable_col_width)
+        return render_template("text_overview.html", search_result=search_result, results=results, publications=publications, sum_publications=sum_publications, autorin_link=autorin_link, labels=labels, values=values, max=max, fazit=fazit, infotable_col_width=infotable_col_width)
 
 # page with chart on most common words in all texts
 @app.route("/woerterchart", methods=["GET"])

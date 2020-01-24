@@ -156,6 +156,60 @@ def prepare_results(rows, site, special):
 
     return results
 
+def prepare_publications(rows_publ):
+    # Safe results from query in object
+    class Publication:
+        def __init__(self, rows, i):
+            self.id = i + 1
+            self.titel = rows_publ[i]["titel"]
+            self.verlag = rows_publ[i]["verlag"]
+            self.jahr = rows_publ[i]["jahr"]
+            self.url = rows_publ[i]["url"]
+            
+    publications = []
+    for i in range(len(rows_publ)):
+        publications.append(Publication(rows_publ, i))
+        
+    return publications
+
+def prepare_autorin_link(autorin_name):
+    parts = autorin_name.split(" ")
+    autorin_link = "https://www.perlentaucher.de/autor/"
+    for part in parts:
+        part_lower = part.lower()
+        if "ß" in part_lower:
+            part_lower = part_lower.replace("ß", "ss")
+        if "ö" in part_lower:
+            part_lower = part_lower.replace("ö", "oe")
+        if "ü" in part_lower:
+            part_lower = part_lower.replace("ü", "ue")
+        if "ä" in part_lower:
+            part_lower = part_lower.replace("ä", "ae")
+        if "ć" in part_lower:
+            part_lower = part_lower.replace("ć", "c")
+        if "ğ" in part_lower:
+            part_lower = part_lower.replace("ğ", "g")
+        if "é" in part_lower:
+            part_lower = part_lower.replace("é", "e")
+        if "ž" in part_lower:
+            part_lower = part_lower.replace("ž", "z")
+        if "š" in part_lower:
+            part_lower = part_lower.replace("š", "s")
+        if "à" in part_lower:
+            part_lower = part_lower.replace("à", "a")
+        if "á" in part_lower:
+            part_lower = part_lower.replace("á", "a")
+        if "." in part_lower:
+            part_lower = part_lower.replace(".", "")
+        if part_lower == "peterlicht":
+            part_lower = "peter-licht"
+        autorin_link += part_lower
+        if part != parts[-1]:
+            autorin_link += "-"
+    autorin_link += ".html"
+
+    return autorin_link
+    
 
 def prepare_woerterchart(woerter, current_id):
     # Logic for chart with most common words
