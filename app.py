@@ -153,10 +153,11 @@ def text(search_result):
                         pass
 
         shortlist = ShortList(rows_short)
-
-        return render_template("text_overview.html", search_result=int(search_result), results=results, publications=publications, sum_publications=sum_publications, autorin_link=autorin_link, labels=labels, values=values, max=max, fazit=fazit, shortlist=shortlist, infotable_col_width=infotable_col_width)
     else:
-        return render_template("text_overview.html", search_result=search_result, results=results, publications=publications, sum_publications=sum_publications, autorin_link=autorin_link, labels=labels, values=values, max=max, fazit=fazit, infotable_col_width=infotable_col_width)
+        shortlist = []
+
+    return render_template("text_overview.html", search_result=int(search_result), results=results, publications=publications, sum_publications=sum_publications, autorin_link=autorin_link, labels=labels, values=values, max=max, fazit=fazit, shortlist=shortlist, infotable_col_width=infotable_col_width)
+    
 
 # page with chart on most common words in all texts
 @app.route("/woerterchart", methods=["GET"])

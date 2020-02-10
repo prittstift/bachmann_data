@@ -173,6 +173,7 @@ def prepare_publications(rows_publ):
     return publications
 
 def prepare_autorin_link(autorin_name):
+    # Prepare author's name for perlentaucher url
     parts = autorin_name.split(" ")
     autorin_link = "https://www.perlentaucher.de/autor/"
     for part in parts:
@@ -343,11 +344,6 @@ def apology(message, code=400):
 
 def login_required(f):
     # Logic for internal sites
-    """
-    Decorate routes to require login.
-
-    http://flask.pocoo.org/docs/1.0/patterns/viewdecorators/
-    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("user_id") is None:
