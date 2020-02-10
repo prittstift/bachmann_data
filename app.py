@@ -49,23 +49,22 @@ def index():
         search_term = ""
         # String of criteria that have been searched by
         mult_crit = ""
-
+        
         for criterion in criteria:
             # Search by criterion
-            if request.form.get(criterion):
-                temp = request.form.get(criterion)
+            temp = request.form.get(criterion)
+            if temp != None and temp != "":
                 search_term += str(temp) + "+"
                 mult_crit += criterion + "+"
+        if search_term == "":
+            # Incorrect search
+            return apology("must provide input", 404)
         if "+" == search_term[-1]:
             search_term = search_term[:-1]
         if "+" == mult_crit[-1]:
             mult_crit = mult_crit[:-1]
 
-        if mult_crit == "":
-            # Incorrect search
-            return apology("must provide input", 400)
-        else:
-            return redirect("search/q={}&criterion={}".format(str(search_term), str(mult_crit)))
+        return redirect("search/q={}&criterion={}".format(str(search_term), str(mult_crit)))
 
     # request method "GET"
     else:
@@ -87,6 +86,8 @@ def search(search_term, criterion):
 # text overview page
 @app.route("/text/<int:search_result>",  methods=["GET"])
 def text(search_result):
+    if search_result not in range(1,829):
+        return apology("Page Not Found", 404)
     # Query database
     rows = db.execute("SELECT * FROM autorinnen WHERE autorinnen.id = :text_id",
                       {"text_id": search_result}).fetchall()
@@ -174,6 +175,9 @@ def woerterchart():
 @app.route("/charts/<string:criterion>", methods=["GET"])
 def kritikerinnen(criterion):
     """Show charts by criterion"""
+    criteria = ["kritikerinnen", "laender", "orte", "wochentage", "w-m"]
+    if criterion not in criteria:
+        return apology("Page Not Found",404)
     # Query database (table with individual infos on authors not yet implemented)
     rows = db.execute("SELECT * FROM autorinnen WHERE id <= 304").fetchall()
     # Safe results in results object
